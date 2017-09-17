@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.xjztest.com/"/>
-  <updated>2017-09-17T13:54:38.873Z</updated>
+  <updated>2017-09-16T03:48:22.173Z</updated>
   <id>http://blog.xjztest.com/</id>
   
   <author>
@@ -15,26 +15,6 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Test Post</title>
-    <link href="http://blog.xjztest.com/2017/09/17/Test-Post/"/>
-    <id>http://blog.xjztest.com/2017/09/17/Test-Post/</id>
-    <published>2017-09-17T13:53:54.000Z</published>
-    <updated>2017-09-17T13:54:38.873Z</updated>
-    
-    <content type="html"><![CDATA[<!-- toc --><!-- Description to show on index here  --><h1 id="This-Post-just-for-Testing"><a href="#This-Post-just-for-Testing" class="headerlink" title="This Post just for Testing"></a>This Post just for Testing</h1><a id="more"></a><h2 id="Foo"><a href="#Foo" class="headerlink" title="Foo"></a>Foo</h2><h2 id="Bar"><a href="#Bar" class="headerlink" title="Bar"></a>Bar</h2><h3 id="Bar-1"><a href="#Bar-1" class="headerlink" title="Bar-1"></a>Bar-1</h3><ul><li>Hey</li><li>There</li><li>!</li></ul>]]></content>
-    
-    <summary type="html">
-    
-      &lt;!-- toc --&gt;
-&lt;!-- Description to show on index here  --&gt;
-&lt;h1 id=&quot;This-Post-just-for-Testing&quot;&gt;&lt;a href=&quot;#This-Post-just-for-Testing&quot; class=&quot;headerlink&quot; title=&quot;This Post just for Testing&quot;&gt;&lt;/a&gt;This Post just for Testing&lt;/h1&gt;
-    
-    </summary>
-    
-    
-  </entry>
   
   <entry>
     <title>Hello World</title>
