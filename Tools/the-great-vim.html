@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+    <meta name="author" content="Stark-X">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Stark-X">
+    
+    <meta name="keywords" content="Vim,plugins,IDE,hexo,hexo-theme,hexo-blog,stark-x,blog,博客">
+    
+    <meta name="description" content="">
+    <meta name="description" content="Vim - the ubiquitous text editor Vim is a highly configurable text editor for efficiently creating and changing any kind of text. It is included as “vi” with most UNIX systems and with Apple OS X.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="『上古神器』Vim">
+<meta property="og:url" content="https://blog.stark-x.cn/Tools/the-great-vim.html">
+<meta property="og:site_name" content="Stark-X&#39;s Blog">
+<meta property="og:description" content="Vim - the ubiquitous text editor Vim is a highly configurable text editor for efficiently creating and changing any kind of text. It is included as “vi” with most UNIX systems and with Apple OS X.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://images-na.ssl-images-amazon.com/images/I/614qewK71jL.jpg">
+<meta property="article:published_time" content="2018-08-31T12:00:00.000Z">
+<meta property="article:modified_time" content="2022-04-10T13:43:38.873Z">
+<meta property="article:author" content="Stark-X">
+<meta property="article:tag" content="Vim">
+<meta property="article:tag" content="Coding">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images-na.ssl-images-amazon.com/images/I/614qewK71jL.jpg">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    
+    <title>『上古神器』Vim · Stark-X&#39;s Blog</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href= "/css/style.css?v=20210204" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= "/css/mobile.css?v=20210204" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href= "/assets/favicon.ico" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
+    <link rel="preload" href="/scripts/main.js?v=20210204" as="script" />
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/js/all.min.js"  data-auto-replace-svg="nest" ></script>
+    
+        <!-- algolia -->
+        <script>
+            
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                appId: 'K1YQXDVE38',
+                apiKey: 'c6406e3722b79ee948199cfde68931e8',
+                indexName: 'my-hexo-blog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b4324daa63fffc90868f64602c39f764";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    
+    <!-- 谷歌统计  -->
+    
+    <script>
+        (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-123254244-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+    
+<meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Stark-X's Blog" type="application/atom+xml">
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >Stark-X&#39;s Blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">『上古神器』Vim</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>Stark-X's Blog</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+height:50vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(https://res.cloudinary.com/stark/image/upload/v1531667285/Forrest-And-Mountains-Illustration_gfgtys.png)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            『上古神器』Vim
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Vim">Vim</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "Coding">Coding</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">3.6k</span>阅读时长: <span class="post-count reading-time">19 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2018/08/31</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <!-- toc -->
+<!-- Description to show on index here  -->
+<blockquote>
+<p><strong>Vim - the ubiquitous text editor</strong>
+Vim is a highly configurable text editor for efficiently creating and changing any kind of text. It is included as “vi” with most UNIX systems and with Apple OS X.
+Vim 是一个可用于高效率创建或者编辑任意类型文本的高度定制化的文本编辑。它以&quot;vi&quot;命令存在于在大多数的UNIX 操作系统以及Apple OS X 中。</p>
+<p align="right">--- https://www.vim.org/</p>
+</blockquote>
+<p>Vim 作为一个“上古”编辑器，它提供了很多很神奇高效的特性，以至于在现代编辑器/强大的IDE的选择之中有一席之地。
+Vim有一个很合我心意的特性，在使用它的时候，完全不需要使用鼠标，眼睛看到哪就可以编辑哪，现在能支持Vim特性的地方我都安装上了对应的插件，例如Chrome的插件：Vimium, Idea的插件：Ideavim。</p>
+<span id="more"></span>
+<h2 id="入门教程">入门教程</h2>
+<p>网上有大量的入门教程，读者可以自行选择，在此推荐其中几个学习VIM的教程。</p>
+<ul>
+<li>Vim自带的互动教程，安装好Vim之后，在终端执行<code>vimtutor zh_CN</code>进入到互动教程中</li>
+<li><a target="_blank" rel="noopener" href="https://vim-adventures.com/">vim-adverntures</a> 线上游戏的方式学习Vim</li>
+<li><a target="_blank" rel="noopener" href="https://www.openvim.com/tutorial.html">openvim-tutorial</a> 网页互动教程</li>
+</ul>
+<p><small>* <em>Vim的学习曲线非常陡峭，在学习过程中可能会出现头晕、心悸、想砸键盘等情况。</em></small></p>
+<h2 id="进阶">进阶</h2>
+<p>推荐阅读<a target="_blank" rel="noopener" href="https://book.douban.com/subject/25869486/">《Vim实用技巧》(Practical Vim)</a>
+<img src="https://images-na.ssl-images-amazon.com/images/I/614qewK71jL.jpg" alt="Vim实用技巧" width=50%></p>
+<blockquote>
+<p>I’ve been using Vim for server maintenance for more than fifteen years now, but I’ve only recently started using it for software development. I thought I knew Vim, but Practical Vim has massively improved my code-wrangling productivity.</p>
+<p align="right">--- Graeme Mathieson (Software Engineer, Rubaidh Ltd.)</p>
+</blockquote>
+<h2 id="As-IDE">As IDE</h2>
+<p>在学习了以上的内容，相信读者已经可以使用Vim进行大部分的文本编辑工作了，但是把它作为写代码的工具，在没有经过任何配置的情况下，会让人觉得缺了点什么，没法作为主要编辑器，这个时候Vim的一大特性 — 插件，可以发挥它的作用了。配合适当的插件，Vim可以拥有文件树、自动补全等IDE提供的特性。
+当然，在进行<strong>大项目</strong>的开发、重构的时候，我还是推荐使用IDE配合Vim插件。</p>
+<h3 id="vimrc-位置">vimrc 位置</h3>
+<p>在Vim里执行<code>:help vimrc</code>，帮助文档里有列出vimrc的位置。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Places for your personal initializations:</span><br><span class="line">        Unix		$HOME/.vimrc or $HOME/.vim/vimrc</span><br><span class="line">        OS/2		$HOME/.vimrc, $HOME/vimfiles/vimrc</span><br><span class="line">                        or $VIM/.vimrc (or _vimrc)</span><br><span class="line">        MS-Windows	$HOME/_vimrc, $HOME/vimfiles/vimrc</span><br><span class="line">                        or $VIM/_vimrc</span><br><span class="line">        Amiga		s:.vimrc, home:.vimrc, home:vimfiles:vimrc</span><br><span class="line">                        or $VIM/.vimrc</span><br></pre></td></tr></table></figure>
+<h3 id="插件">插件</h3>
+<p>以下列表是我使用的插件，我使用了<a target="_blank" rel="noopener" href="https://github.com/junegunn/vim-plug"><code>Plug</code></a>管理这些插件，曾经我使用的是<a target="_blank" rel="noopener" href="https://github.com/VundleVim/Vundle.vim"><code>Vundle</code></a>，后来发现Plug有更强大的特性，就切换过去了。相对于<code>Vundle</code>，<code>Plug</code>还支持异步加载、异步更新、自定义触发安装函数等特性，大大增加了管理插件的效率、便捷性，最重要的是<code>Vundle</code>已经有差不多4年没有新的Release了。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/tpope/vim-fugitive">tpope/vim-fugitive</a>: Vim里使用Git</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Valloric/YouCompleteMe"><strong>Valloric/YouCompleteMe</strong></a>: 必装，代码补全，代码提示</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Yggdroot/indentLine">Yggdroot/indentLine</a>: 缩进参考线</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/scrooloose/nerdtree">scrooloose/nerdtree</a>: 文件目录树</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Xuyuanp/nerdtree-git-plugin">Xuyuanp/nerdtree-git-plugin</a>: 在目录树中标识Git的仓库变更</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/scrooloose/nerdcommenter"><strong>scrooloose/nerdcommenter</strong></a>: 必装，快捷注释</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/plasticboy/vim-markdown">plasticboy/vim-markdown</a>: 支持Markdown语法高亮</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/iamcco/markdown-preview.vim">iamcco/markdown-preview.vim</a>: Markdown预览</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vim-airline/vim-airline">vim-airline/vim-airline</a>: 优化的状态栏</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vim-airline/vim-airline-themes">vim-airline/vim-airline-themes</a>: 状态栏主题</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/SirVer/ultisnips">SirVer/ultisnips</a>: 代码块支持，类似Idea系列的Live-Template</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/honza/vim-snippets">honza/vim-snippets</a>: 默认代码块，与&quot;ultisnips&quot;配合</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/terryma/vim-multiple-cursors">terryma/vim-multiple-cursors</a>: 支持多处同时修改</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/altercation/vim-colors-solarized">altercation/vim-colors-solarized</a>: solarized主题</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/morhetz/gruvbox">morhetz/gruvbox</a>: gruvbox主题</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/mattn/emmet-vim"><strong>mattn/emmet-vim</strong></a>: 前端程序员必装，快速编写标签</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/tpope/vim-surround">tpope/vim-surround</a>: 快速包括括号</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/tpope/vim-repeat">tpope/vim-repeat</a>: 让<code>.</code>正确重复部分插件的动作</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/leafgarland/typescript-vim">leafgarland/typescript-vim</a>: 支持Typescript</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/w0rp/ale">w0rp/ale</a>: 异步Lint引擎</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/posva/vim-vue">posva/vim-vue</a>: 支持Vue</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/jiangmiao/auto-pairs">jiangmiao/auto-pairs</a>: 自动补全括号，快速包括括号</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/junegunn/vim-easy-align">junegunn/vim-easy-align</a>: 快速对齐</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/easymotion/vim-easymotion">easymotion/vim-easymotion</a>: 快速移动当前光标</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/python-mode/python-mode">python-mode/python-mode</a>: 增强对Python的支持</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vim-scripts/groovyindent-unix">vim-scripts/groovyindent-unix</a>: 正确的Groovy缩进</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Chiel92/vim-autoformat">Chiel92/vim-autoformat</a>: 正确的格式化代码</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/arecarn/vim-fold-cycle">arecarn/vim-fold-cycle</a>: 快速展开关闭折叠</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/pseewald/vim-anyfold">pseewald/vim-anyfold</a>: 优化缩进</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/xolox/vim-easytags">xolox/vim-easytags</a>: 自动生成tag（用于列出函数/方法）</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/vim-scripts/taglist.vim">vim-scripts/taglist.vim</a>: 官方tag支持</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/xolox/vim-misc">xolox/vim-misc</a>: xolox的插件的支持</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/chemzqm/wxapp.vim">chemzqm/wxapp.vim</a>: 支持微信小程序开发</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/sheerun/vim-polyglot">sheerun/vim-polyglot</a>: 语法支持增强</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/mileszs/ack.vim">mileszs/ack.vim</a>: 文件内容快速搜索（当前工作目录下的所有文件）</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/junegunn/fzf">junegunn/fzf</a>: 模糊搜索的依赖</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/junegunn/fzf.vim">junegunn/fzf.vim</a>: 文件名、目录模糊搜索（当前工作目录下的所有文件）</li>
+</ul>
+<h2 id="参考配置">参考配置</h2>
+<p>Github: <a target="_blank" rel="noopener" href="https://github.com/Stark-X/dotfiles/blob/master/vim/.vimrc">https://github.com/Stark-X/dotfiles/blob/master/vim/.vimrc</a>
+这是我的vimrc，读者可以根据自己的习惯作出相应调整，欢迎大家在评论区提出建议、疑问。</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&quot; Remove python3(3.7) importlib deprecated warning</span></span><br><span class="line"><span class="string">&quot; It had been fixed from &quot;</span>patch-<span class="number">8.1</span>.<span class="number">201</span><span class="comment">&quot;</span></span><br><span class="line"><span class="comment">&quot; https://github.com/vim/vim/issues/3117</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;python3&#x27;</span>) &amp;&amp; !has(<span class="string">&#x27;patch-8.1.201&#x27;</span>)</span><br><span class="line">  silent! <span class="keyword">python3</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;set nocompatible              &quot;</span> <span class="keyword">be</span> iMproved, required</span><br><span class="line"><span class="keyword">filetype</span> off                  <span class="comment">&quot; required</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Initialize for the vim-plug</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;win32&#x27;</span>)</span><br><span class="line">    <span class="comment">&quot; set rtp+=$USERPROFILE/vimfiles/bundle/Vundle.vim/</span></span><br><span class="line">    <span class="keyword">call</span> plug#begin(<span class="string">&#x27;$USERPROFILE/vimfiles/bundle/&#x27;</span>)</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="comment">&quot; set rtp+=~/.vim/bundle/Vundle.vim/</span></span><br><span class="line">    <span class="keyword">call</span> plug#begin(<span class="string">&#x27;~/.vim/bundle/&#x27;</span>)</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;tpope/vim-fugitive&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;vim-scripts/L9&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Post-update hooks to compile the YCM</span></span><br><span class="line"><span class="comment">&quot; ==================== YouCompleteMe ====================</span></span><br><span class="line"><span class="keyword">function!</span> <span class="title">BuildYCM</span><span class="params">(info)</span></span><br><span class="line">  <span class="comment">&quot; info is a dictionary with 3 fields</span></span><br><span class="line">  <span class="comment">&quot; - name:   name of the plugin</span></span><br><span class="line">  <span class="comment">&quot; - status: &#x27;installed&#x27;, &#x27;updated&#x27;, or &#x27;unchanged&#x27;</span></span><br><span class="line">  <span class="comment">&quot; - force:  set on PlugInstall! or PlugUpdate!</span></span><br><span class="line">  <span class="keyword">if</span> <span class="variable">a:info</span>.status == <span class="string">&#x27;installed&#x27;</span> || <span class="variable">a:info</span>.force</span><br><span class="line">    !./install.<span class="keyword">py</span> --<span class="keyword">go</span>-completer --js-completer --java-completer --clang-completer</span><br><span class="line">  <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endfunction</span></span><br><span class="line">Plug <span class="string">&#x27;Valloric/YouCompleteMe&#x27;</span>, &#123; <span class="string">&#x27;do&#x27;</span>: <span class="keyword">function</span>(<span class="string">&#x27;BuildYCM&#x27;</span>) &#125;</span><br><span class="line"><span class="comment">&quot; ==================== YouCompleteMe ====================</span></span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;Yggdroot/indentLine&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;scrooloose/nerdtree&#x27;</span>, &#123; <span class="string">&#x27;on&#x27;</span>: <span class="string">&#x27;NERDTreeToggle&#x27;</span> &#125;</span><br><span class="line">Plug <span class="string">&#x27;Xuyuanp/nerdtree-git-plugin&#x27;</span></span><br><span class="line"><span class="keyword">map</span> <span class="symbol">&lt;f3&gt;</span> :NERDTreeToggle<span class="symbol">&lt;CR&gt;</span></span><br><span class="line"><span class="comment">&quot; Ignore *.pyc</span></span><br><span class="line"><span class="keyword">let</span> NERDTreeIgnore = [<span class="string">&#x27;\.pyc$&#x27;</span>]</span><br><span class="line">autocmd! User nerdtree <span class="keyword">echom</span> <span class="string">&#x27;NERDTree is now loaded.&#x27;</span></span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;scrooloose/nerdcommenter&#x27;</span></span><br><span class="line"><span class="comment">&quot; markdown syntax highlight</span></span><br><span class="line">Plug <span class="string">&#x27;plasticboy/vim-markdown&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;iamcco/markdown-preview.vim&#x27;</span>, &#123; <span class="string">&#x27;for&#x27;</span>: <span class="string">&#x27;markdown&#x27;</span> &#125;</span><br><span class="line">autocmd! User markdown-preview.<span class="keyword">vim</span> <span class="keyword">echom</span> <span class="string">&#x27;MarkdownPreview is now loaded.&#x27;</span></span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;vim-airline/vim-airline&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;vim-airline/vim-airline-themes&#x27;</span></span><br><span class="line"><span class="comment">&quot; ==================== Snippets ====================</span></span><br><span class="line">Plug <span class="string">&#x27;SirVer/ultisnips&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;honza/vim-snippets&#x27;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:UltiSnipsExpandTrigger</span>=<span class="string">&quot;&lt;tab&gt;&lt;tab&gt;&quot;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:UltiSnipsJumpForwardTrigger</span>=<span class="string">&quot;&lt;c-b&gt;&quot;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:UltiSnipsJumpBackwardTrigger</span>=<span class="string">&quot;&lt;c-z&gt;&quot;</span></span><br><span class="line"><span class="comment">&quot; ==================== Snippets ====================</span></span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;terryma/vim-multiple-cursors&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;altercation/vim-colors-solarized&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;morhetz/gruvbox&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;mattn/emmet-vim&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;tpope/vim-surround&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;tpope/vim-repeat&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;leafgarland/typescript-vim&#x27;</span></span><br><span class="line"><span class="comment">&quot; Plug &#x27;ctrlpvim/ctrlp.vim&#x27;</span></span><br><span class="line"><span class="comment">&quot; Asynchronous Lint Engine</span></span><br><span class="line">Plug <span class="string">&#x27;w0rp/ale&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;posva/vim-vue&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;jiangmiao/auto-pairs&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;junegunn/vim-easy-align&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;easymotion/vim-easymotion&#x27;</span></span><br><span class="line"><span class="comment">&quot; Themes</span></span><br><span class="line">Plug <span class="string">&#x27;sjl/badwolf&#x27;</span></span><br><span class="line"><span class="comment">&quot; Optimization for Python</span></span><br><span class="line">Plug <span class="string">&#x27;python-mode/python-mode&#x27;</span>, &#123; <span class="string">&#x27;for&#x27;</span>: <span class="string">&#x27;python&#x27;</span> &#125;</span><br><span class="line">autocmd! User <span class="keyword">python</span>-<span class="keyword">mode</span> <span class="keyword">echom</span> <span class="string">&#x27;Python-Mode is now loaded.&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ==================== Auto Format ====================</span></span><br><span class="line">Plug <span class="string">&#x27;vim-scripts/groovyindent-unix&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;Chiel92/vim-autoformat&#x27;</span></span><br><span class="line"><span class="keyword">noremap</span> <span class="symbol">&lt;F4&gt;</span> :Autoformat<span class="symbol">&lt;CR&gt;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:formatter_yapf_style</span> = <span class="string">&#x27;pep8&#x27;</span></span><br><span class="line"><span class="comment">&quot; ==================== Auto Format ====================</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ==================== Code Folding ====================</span></span><br><span class="line">Plug <span class="string">&#x27;arecarn/vim-fold-cycle&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;pseewald/vim-anyfold&#x27;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:fold_cycle_default_mapping</span> = <span class="number">0</span> <span class="comment">&quot;disable default mappings</span></span><br><span class="line"><span class="keyword">nmap</span> &lt;+&gt; <span class="symbol">&lt;Plug&gt;</span>(<span class="keyword">fold</span>-cycle-<span class="keyword">open</span>)</span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;-&gt;</span> <span class="symbol">&lt;Plug&gt;</span>(<span class="keyword">fold</span>-cycle-<span class="keyword">close</span>)</span><br><span class="line"><span class="keyword">autocmd</span> Filetype <span class="keyword">python</span> <span class="keyword">let</span> <span class="variable">b:anyfold_activate</span>=<span class="number">1</span></span><br><span class="line"><span class="keyword">set</span> <span class="built_in">foldlevel</span>=<span class="number">0</span></span><br><span class="line"><span class="comment">&quot; ==================== Code Folding ====================</span></span><br><span class="line"><span class="comment">&quot; ==================== Tags Generator ====================</span></span><br><span class="line"><span class="comment">&quot; Use ^] to jump to definiation</span></span><br><span class="line">Plug <span class="string">&#x27;xolox/vim-easytags&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;xolox/vim-misc&#x27;</span></span><br><span class="line"><span class="comment">&quot; ==================== Tags Generator ====================</span></span><br><span class="line"><span class="comment">&quot; ==================== Tag List ====================</span></span><br><span class="line">Plug <span class="string">&#x27;vim-scripts/taglist.vim&#x27;</span>, &#123; <span class="string">&#x27;on&#x27;</span>: <span class="string">&#x27;TlistToggle&#x27;</span> &#125;</span><br><span class="line"><span class="keyword">noremap</span> <span class="symbol">&lt;F2&gt;</span> :TlistToggle<span class="symbol">&lt;CR&gt;</span></span><br><span class="line"><span class="comment">&quot; ==================== Tag List ====================</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ==================== WeChat App ====================</span></span><br><span class="line">Plug <span class="string">&#x27;chemzqm/wxapp.vim&#x27;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:neomake_wxml_enabled_makers</span> = [<span class="string">&#x27;tidy&#x27;</span>, <span class="string">&#x27;stylelint&#x27;</span>]</span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:user_emmet_settings</span> = &#123;</span><br><span class="line">  \ <span class="string">&#x27;wxss&#x27;</span>: &#123;</span><br><span class="line">  \   <span class="string">&#x27;extends&#x27;</span>: <span class="string">&#x27;css&#x27;</span>,</span><br><span class="line">  \ &#125;,</span><br><span class="line">  \ <span class="string">&#x27;wxml&#x27;</span>: &#123;</span><br><span class="line">  \   <span class="string">&#x27;extends&#x27;</span>: <span class="string">&#x27;html&#x27;</span>,</span><br><span class="line">  \   <span class="string">&#x27;aliases&#x27;</span>: &#123;</span><br><span class="line">  \     <span class="string">&#x27;div&#x27;</span>: <span class="string">&#x27;view&#x27;</span>,</span><br><span class="line">  \     <span class="string">&#x27;span&#x27;</span>: <span class="string">&#x27;text&#x27;</span>,</span><br><span class="line">  \   &#125;,</span><br><span class="line">  \  <span class="string">&#x27;default_attributes&#x27;</span>: &#123;</span><br><span class="line">  \     <span class="string">&#x27;block&#x27;</span>: [&#123;<span class="string">&#x27;wx:for-items&#x27;</span>: <span class="string">&#x27;&#123;&#123;list&#125;&#125;&#x27;</span>,<span class="string">&#x27;wx:for-item&#x27;</span>: <span class="string">&#x27;&#123;&#123;item&#125;&#125;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;navigator&#x27;</span>: [&#123;<span class="string">&#x27;url&#x27;</span>: <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;redirect&#x27;</span>: <span class="string">&#x27;false&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;scroll-view&#x27;</span>: [&#123;<span class="string">&#x27;bindscroll&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;swiper&#x27;</span>: [&#123;<span class="string">&#x27;autoplay&#x27;</span>: <span class="string">&#x27;false&#x27;</span>, <span class="string">&#x27;current&#x27;</span>: <span class="string">&#x27;0&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;icon&#x27;</span>: [&#123;<span class="string">&#x27;type&#x27;</span>: <span class="string">&#x27;success&#x27;</span>, <span class="string">&#x27;size&#x27;</span>: <span class="string">&#x27;23&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;progress&#x27;</span>: [&#123;<span class="string">&#x27;precent&#x27;</span>: <span class="string">&#x27;0&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;button&#x27;</span>: [&#123;<span class="string">&#x27;size&#x27;</span>: <span class="string">&#x27;default&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;checkbox-group&#x27;</span>: [&#123;<span class="string">&#x27;bindchange&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;checkbox&#x27;</span>: [&#123;<span class="string">&#x27;value&#x27;</span>: <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;checked&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;form&#x27;</span>: [&#123;<span class="string">&#x27;bindsubmit&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;input&#x27;</span>: [&#123;<span class="string">&#x27;type&#x27;</span>: <span class="string">&#x27;text&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;label&#x27;</span>: [&#123;<span class="string">&#x27;for&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;picker&#x27;</span>: [&#123;<span class="string">&#x27;bindchange&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;radio-group&#x27;</span>: [&#123;<span class="string">&#x27;bindchange&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;radio&#x27;</span>: [&#123;<span class="string">&#x27;checked&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;switch&#x27;</span>: [&#123;<span class="string">&#x27;checked&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;slider&#x27;</span>: [&#123;<span class="string">&#x27;value&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;action-sheet&#x27;</span>: [&#123;<span class="string">&#x27;bindchange&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;modal&#x27;</span>: [&#123;<span class="string">&#x27;title&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;loading&#x27;</span>: [&#123;<span class="string">&#x27;bindchange&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;toast&#x27;</span>: [&#123;<span class="string">&#x27;duration&#x27;</span>: <span class="string">&#x27;1500&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;audio&#x27;</span>: [&#123;<span class="string">&#x27;src&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;video&#x27;</span>: [&#123;<span class="string">&#x27;src&#x27;</span>: <span class="string">&#x27;&#x27;</span>&#125;],</span><br><span class="line">  \     <span class="string">&#x27;image&#x27;</span>: [&#123;<span class="string">&#x27;src&#x27;</span>: <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;mode&#x27;</span>: <span class="string">&#x27;scaleToFill&#x27;</span>&#125;],</span><br><span class="line">  \   &#125;</span><br><span class="line">  \ &#125;,</span><br><span class="line">  \&#125;</span><br><span class="line"><span class="comment">&quot; ==================== WeChat App ====================</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ==================== Syntax Support  ====================</span></span><br><span class="line"><span class="comment">&quot; Plug &#x27;martinda/Jenkinsfile-vim-syntax&#x27;</span></span><br><span class="line">Plug <span class="string">&#x27;sheerun/vim-polyglot&#x27;</span></span><br><span class="line"><span class="comment">&quot; ==================== Syntax Support  ====================</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ==================== ACK ====================</span></span><br><span class="line"><span class="comment">&quot; Take place the vimgrep</span></span><br><span class="line"><span class="keyword">function!</span> <span class="title">Install_ag</span><span class="params">(info)</span></span><br><span class="line">    <span class="comment">&quot; info is a dictionary with 3 fields</span></span><br><span class="line">    <span class="comment">&quot; - name:   name of the plugin</span></span><br><span class="line">    <span class="comment">&quot; - status: &#x27;installed&#x27;, &#x27;updated&#x27;, or &#x27;unchanged&#x27;</span></span><br><span class="line">    <span class="comment">&quot; - force:  set on PlugInstall! or PlugUpdate!</span></span><br><span class="line">    <span class="keyword">if</span> <span class="variable">a:info</span>.status == <span class="string">&#x27;installed&#x27;</span> || <span class="variable">a:info</span>.force</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;macunix&#x27;</span>)</span><br><span class="line">            !brew install the_silver_searcher </span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;Please access https://github.com/ggreer/the_silver_searcher for the installation&#x27;</span></span><br><span class="line">        <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endfunction</span></span><br><span class="line"><span class="comment">&quot; Use ag(the_silver_searcher) as the search engine</span></span><br><span class="line">Plug <span class="string">&#x27;mileszs/ack.vim&#x27;</span>, &#123; <span class="string">&#x27;do&#x27;</span>: <span class="keyword">function</span>(<span class="string">&#x27;Install_ag&#x27;</span>) &#125;</span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ackprg</span> = <span class="string">&#x27;ag --vimgrep --hidden&#x27;</span></span><br><span class="line"><span class="comment">&quot; ==================== ACK ====================</span></span><br><span class="line"></span><br><span class="line">Plug <span class="string">&#x27;junegunn/fzf&#x27;</span>, &#123; <span class="string">&#x27;dir&#x27;</span>: <span class="string">&#x27;~/.fzf&#x27;</span>, <span class="string">&#x27;do&#x27;</span>: <span class="string">&#x27;./install --all&#x27;</span> &#125;</span><br><span class="line">Plug <span class="string">&#x27;junegunn/fzf.vim&#x27;</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;leader&gt;</span><span class="symbol">&lt;tab&gt;</span> <span class="symbol">&lt;plug&gt;</span>(fzf-maps-n)</span><br><span class="line"><span class="keyword">xmap</span> <span class="symbol">&lt;leader&gt;</span><span class="symbol">&lt;tab&gt;</span> <span class="symbol">&lt;plug&gt;</span>(fzf-maps-<span class="keyword">x</span>)</span><br><span class="line"><span class="keyword">omap</span> <span class="symbol">&lt;leader&gt;</span><span class="symbol">&lt;tab&gt;</span> <span class="symbol">&lt;plug&gt;</span>(fzf-maps-<span class="keyword">o</span>)</span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;C-P&gt;</span> :Files<span class="symbol">&lt;CR&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; All of your Plugs must be added before the following line</span></span><br><span class="line"><span class="keyword">call</span> plug#end()            <span class="comment">&quot; required</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; To ignore plugin indent changes, instead use:</span></span><br><span class="line"><span class="comment">&quot;filetype plugin on</span></span><br><span class="line"><span class="comment">&quot;</span></span><br><span class="line"><span class="comment">&quot;-----------------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Configuration file for vim</span></span><br><span class="line"><span class="keyword">set</span> modelines=<span class="number">0</span>		<span class="comment">&quot; CVE-2007-2438</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Normally we use vim-extensions. If you want true vi-compatibility</span></span><br><span class="line"><span class="comment">&quot; remove change the following statements</span></span><br><span class="line"><span class="keyword">set</span> nocompatible	<span class="comment">&quot; Use Vim defaults instead of 100% vi compatibility</span></span><br><span class="line"><span class="keyword">set</span> backspace=<span class="number">2</span>		<span class="comment">&quot; more powerful backspacing</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot; Don&#x27;t write backup file if vim is being called by &quot;</span>crontab -<span class="keyword">e</span><span class="comment">&quot;</span></span><br><span class="line"><span class="keyword">au</span> BufWrite /private/tmp/crontab.* <span class="keyword">set</span> nowritebackup</span><br><span class="line"><span class="string">&quot; Don&#x27;t write backup file if vim is being called by &quot;</span>chpass<span class="comment">&quot;</span></span><br><span class="line"><span class="keyword">au</span> BufWrite /private/etc/<span class="keyword">pw</span>.* <span class="keyword">set</span> nowritebackup</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; theme</span></span><br><span class="line"><span class="keyword">set</span> background=dark</span><br><span class="line"><span class="comment">&quot; let g:solarized_termcolors=256</span></span><br><span class="line"><span class="comment">&quot; colorscheme solarized</span></span><br><span class="line"><span class="comment">&quot;colorscheme desert</span></span><br><span class="line"><span class="comment">&quot; colorscheme gruvbox </span></span><br><span class="line"><span class="string">&quot; let g:gruvbox_contrast_dark=&quot;</span>hard<span class="comment">&quot;</span></span><br><span class="line"><span class="keyword">colorscheme</span> badwolf</span><br><span class="line"><span class="keyword">set</span> guifont=Source_Code_Pro:h13</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> hls</span><br><span class="line"><span class="keyword">set</span> <span class="keyword">nu</span></span><br><span class="line"><span class="keyword">set</span> tabstop=<span class="number">8</span></span><br><span class="line"><span class="keyword">set</span> <span class="built_in">shiftwidth</span>=<span class="number">4</span></span><br><span class="line"><span class="keyword">set</span> softtabstop=<span class="number">8</span></span><br><span class="line"><span class="keyword">set</span> smarttab</span><br><span class="line"><span class="keyword">set</span> smartindent</span><br><span class="line"><span class="keyword">set</span> expandtab</span><br><span class="line"><span class="comment">&quot;突出显示当前行</span></span><br><span class="line"><span class="keyword">set</span> cursorline</span><br><span class="line"><span class="comment">&quot;开启状态栏</span></span><br><span class="line"><span class="keyword">set</span> laststatus=<span class="number">2</span></span><br><span class="line"><span class="comment">&quot;显示输入的命令</span></span><br><span class="line"><span class="keyword">set</span> showcmd</span><br><span class="line"><span class="comment">&quot;在状态栏显示当前光标位置</span></span><br><span class="line"><span class="keyword">set</span> ruler</span><br><span class="line"><span class="comment">&quot;命令模式下按tab列出补全的命令</span></span><br><span class="line"><span class="keyword">set</span> wildmenu</span><br><span class="line"></span><br><span class="line"><span class="keyword">vmap</span> <span class="symbol">&lt;C-c&gt;</span> <span class="comment">&quot;+y</span></span><br><span class="line"><span class="keyword">imap</span> jk <span class="symbol">&lt;Esc&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">autocmd</span> FileType <span class="keyword">c</span>,cpp <span class="keyword">setlocal</span> <span class="built_in">cindent</span></span><br><span class="line"><span class="keyword">autocmd</span> FileType feature <span class="keyword">setlocal</span> <span class="built_in">shiftwidth</span>=<span class="number">2</span></span><br><span class="line"><span class="keyword">autocmd</span> FileType <span class="keyword">make</span> <span class="keyword">setlocal</span> noet</span><br><span class="line"><span class="keyword">autocmd</span> FileType groovy <span class="keyword">setlocal</span> <span class="built_in">cindent</span></span><br><span class="line"><span class="keyword">autocmd</span> FileType yaml,<span class="keyword">conf</span>,json,javascript,vue,markdown <span class="keyword">setlocal</span> <span class="built_in">cindent</span> <span class="keyword">sw</span>=<span class="number">2</span></span><br><span class="line"><span class="keyword">autocmd</span> Filetype markdown <span class="keyword">setlocal</span> spell</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; for typescript-vim</span></span><br><span class="line"><span class="keyword">autocmd</span> QuickFixCmdPost [^<span class="keyword">l</span>]* nested <span class="keyword">cwindow</span></span><br><span class="line"><span class="keyword">autocmd</span> QuickFixCmdPost    <span class="keyword">l</span>* nested <span class="keyword">lwindow</span></span><br><span class="line"><span class="keyword">autocmd</span> FileType typescript :<span class="keyword">setlocal</span> makeprg=tsc <span class="comment">&quot; find the tsconfig.json to compile</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;markdown-setting: YAML</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:vim_markdown_frontmatter</span>=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;YCM_Settings</span></span><br><span class="line"><span class="keyword">nnoremap</span> <span class="symbol">&lt;leader&gt;</span>jd :YcmCompleter GoToDefinitionElseDeclaration<span class="symbol">&lt;CR&gt;</span></span><br><span class="line"><span class="comment">&quot; nnoremap &lt;F5&gt; :YcmForceCompileAndDiagnostics&lt;CR&gt;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:syntastic_cpp_compiler</span>=<span class="string">&#x27;g++&#x27;</span> <span class="comment">&quot;change the compiler to &#x27;g++&#x27; to support c++11</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:syntastic_cpp_compiler_options</span>=<span class="string">&#x27;-std=c++11 -stdlib=libc++&#x27;</span>  <span class="comment">&quot;set the options of g++ to support c++11</span></span><br><span class="line"><span class="comment">&quot; YCM with TypeScript</span></span><br><span class="line"><span class="keyword">if</span> !exists(<span class="string">&quot;g:ycm_semantic_triggers&quot;</span>)</span><br><span class="line">  <span class="keyword">let</span> <span class="variable">g:ycm_semantic_triggers</span> = &#123;&#125;</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ycm_semantic_triggers</span>[<span class="string">&#x27;typescript&#x27;</span>] = [<span class="string">&#x27;.&#x27;</span>]</span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ycm_autoclose_preview_window_after_completion</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ycm_server_python_interpreter</span> = <span class="string">&#x27;python3&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;MarkdownPreview-KeyMapping</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;silent&gt;</span> <span class="symbol">&lt;F8&gt;</span> <span class="symbol">&lt;Plug&gt;</span>MarkdownPreview        <span class="comment">&quot; for normal mode</span></span><br><span class="line"><span class="keyword">imap</span> <span class="symbol">&lt;silent&gt;</span> <span class="symbol">&lt;F8&gt;</span> <span class="symbol">&lt;Plug&gt;</span>MarkdownPreview        <span class="comment">&quot; for insert mode</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;silent&gt;</span> <span class="symbol">&lt;F9&gt;</span> <span class="symbol">&lt;Plug&gt;</span>StopMarkdownPreview    <span class="comment">&quot; for normal mode</span></span><br><span class="line"><span class="keyword">imap</span> <span class="symbol">&lt;silent&gt;</span> <span class="symbol">&lt;F9&gt;</span> <span class="symbol">&lt;Plug&gt;</span>StopMarkdownPreview    <span class="comment">&quot; for insert mode</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;win32&#x27;</span>)</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">g:mkdp_path_to_chrome</span> = <span class="string">&#x27;C:\Program Files (x86)\Google\Chrome\Application\chrome.exe&#x27;</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;macunix&#x27;</span>)</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">g:mkdp_path_to_chrome</span> = <span class="string">&quot;open -a Google\\ Chrome&quot;</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&quot;gui_macvim&quot;</span>)</span><br><span class="line">    <span class="comment">&quot; Only work on MacVim, the iTerm2 will use ^[</span></span><br><span class="line">    <span class="keyword">set</span> macmeta</span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:mkdp_auto_close</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:mkdp_auto_open</span> = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot;copy and paste</span></span><br><span class="line"><span class="keyword">vmap</span> <span class="symbol">&lt;Leader&gt;</span><span class="keyword">y</span> <span class="comment">&quot;+y</span></span><br><span class="line"><span class="keyword">vmap</span> <span class="symbol">&lt;Leader&gt;</span><span class="keyword">p</span> <span class="comment">&quot;+p</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;Leader&gt;</span><span class="keyword">p</span> <span class="comment">&quot;+p</span></span><br><span class="line"><span class="keyword">vmap</span> <span class="symbol">&lt;Leader&gt;</span><span class="keyword">P</span> <span class="comment">&quot;+P</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;Leader&gt;</span><span class="keyword">P</span> <span class="comment">&quot;+P</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; default width and height</span></span><br><span class="line"><span class="comment">&quot; set lines=27 columns=100</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Emmet (C-y ,)</span></span><br><span class="line"><span class="keyword">autocmd</span> FileType html,css,vue EmmetInstall</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; let the markdown files link normal</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:vim_markdown_conceal</span> = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; vertical split resize</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;c-w&gt;</span>[ :<span class="keyword">vertical</span> <span class="keyword">resize</span> -<span class="number">5</span><span class="symbol">&lt;CR&gt;</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;c-w&gt;</span>] :<span class="keyword">vertical</span> <span class="keyword">resize</span> +<span class="number">5</span><span class="symbol">&lt;CR&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; improve performance</span></span><br><span class="line"><span class="keyword">set</span> lazyredraw</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; airline realted</span></span><br><span class="line"><span class="string">&quot; let g:airline_theme=&quot;</span>wombat<span class="comment">&quot;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:airline_theme</span>=<span class="string">&#x27;badwolf&#x27;</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:airline_powerline_fonts</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:airline</span>#extensions#tabline#enabled = <span class="number">1</span></span><br><span class="line"><span class="keyword">set</span> encoding=utf-<span class="number">8</span></span><br><span class="line"><span class="keyword">set</span> rop=<span class="built_in">type</span>:directx,gamm<span class="variable">a:1</span>.<span class="number">0</span>,contras<span class="variable">t:0</span>.<span class="number">5</span>,leve<span class="variable">l:1</span>,geom:<span class="number">1</span>,renmode:<span class="number">4</span>,taamode:<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; makes the % command work better</span></span><br><span class="line">packadd matchit</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ALE setting</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ale_echo_msg_format</span> = <span class="string">&#x27;[%linter%] %s [%severity%]&#x27;</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;silent&gt;</span> <span class="symbol">&lt;C-k&gt;</span> <span class="symbol">&lt;Plug&gt;</span>(ale_previous_wrap)</span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;silent&gt;</span> <span class="symbol">&lt;C-j&gt;</span> <span class="symbol">&lt;Plug&gt;</span>(ale_next_wrap)</span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ale_linters</span> = &#123;</span><br><span class="line">\   <span class="string">&#x27;javascript&#x27;</span>: [<span class="string">&#x27;standard&#x27;</span>],</span><br><span class="line">\   <span class="string">&#x27;typescript&#x27;</span>: [<span class="string">&#x27;tslint&#x27;</span>],</span><br><span class="line">\   <span class="string">&#x27;python&#x27;</span>: [<span class="string">&#x27;autopep8&#x27;</span>]</span><br><span class="line">\&#125;</span><br><span class="line"><span class="comment">&quot; Fix files when they are saved.</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ale_fix_on_save</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">b:ale_fixers</span> = [<span class="string">&#x27;prettier&#x27;</span>, <span class="string">&#x27;eslint&#x27;</span>, <span class="string">&#x27;autopep8&#x27;</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">has</span>(<span class="string">&#x27;win32&#x27;</span>)</span><br><span class="line">    <span class="keyword">source</span> $VIMRUNTIME/mswin.<span class="keyword">vim</span></span><br><span class="line">    <span class="keyword">behave</span> mswin</span><br><span class="line">    <span class="keyword">set</span> encoding=utf-<span class="number">8</span></span><br><span class="line">    <span class="keyword">set</span> fileencodings=ucs-bom,utf-<span class="number">8</span>,cp936,gb18030,big5,euc-jp,euc-kr,latin1</span><br><span class="line">    <span class="keyword">set</span> fileencoding=utf-<span class="number">8</span> <span class="comment">&quot; 新建文件使用的编码</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&quot; 解决菜单乱码</span></span><br><span class="line">    <span class="keyword">set</span> langmenu=zh_CN</span><br><span class="line">    <span class="keyword">let</span> $LANG = <span class="string">&#x27;zh_CN.UTF-8&#x27;</span></span><br><span class="line">    <span class="keyword">source</span> $VIMRUNTIME/delmenu.<span class="keyword">vim</span></span><br><span class="line">    <span class="keyword">source</span> $VIMRUNTIME/<span class="keyword">menu</span>.<span class="keyword">vim</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&quot; Disable the alt/meta (&lt;M-*&gt;) mapping on the Windows menu.</span></span><br><span class="line">    <span class="keyword">set</span> winaltkeys=<span class="keyword">no</span></span><br><span class="line"><span class="keyword">endif</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; EasyAlign</span></span><br><span class="line"><span class="comment">&quot; Start interactive EasyAlign in visual mode (e.g. vipga)</span></span><br><span class="line"><span class="keyword">xmap</span> ga <span class="symbol">&lt;Plug&gt;</span>(EasyAlign)</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Start interactive EasyAlign for a motion/text object (e.g. gaip)</span></span><br><span class="line"><span class="keyword">nmap</span> ga <span class="symbol">&lt;Plug&gt;</span>(EasyAlign)</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Auto-paris fly mode</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:AutoPairsFlyMode</span> = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Easy search the select content</span></span><br><span class="line"><span class="keyword">vnoremap</span> // <span class="keyword">y</span>/<span class="symbol">&lt;c-r&gt;</span><span class="comment">&quot;&lt;cr&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ctrlp ignore</span></span><br><span class="line"><span class="comment">&quot; let g:ctrlp_custom_ignore = &#x27;\v[\/](node_modules|target|dist)|(\.(swp|ico|git|svn))$&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Comment with one Space</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:NERDSpaceDelims</span>=<span class="number">1</span></span><br><span class="line"><span class="comment">&quot; NERDCommenter for vue settings</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:ft</span> = <span class="string">&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">function!</span> <span class="title">NERDCommenter_before</span><span class="params">()</span></span><br><span class="line">  <span class="keyword">if</span> &amp;ft == <span class="string">&#x27;vue&#x27;</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">g:ft</span> = <span class="string">&#x27;vue&#x27;</span></span><br><span class="line">    <span class="keyword">let</span> stack = <span class="built_in">synstack</span>(<span class="built_in">line</span>(<span class="string">&#x27;.&#x27;</span>), <span class="keyword">col</span>(<span class="string">&#x27;.&#x27;</span>))</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(stack) &gt; <span class="number">0</span></span><br><span class="line">      <span class="keyword">let</span> syn = <span class="built_in">synIDattr</span>((stack)[<span class="number">0</span>], <span class="string">&#x27;name&#x27;</span>)</span><br><span class="line">      <span class="keyword">if</span> <span class="built_in">len</span>(syn) &gt; <span class="number">0</span></span><br><span class="line">        <span class="keyword">exe</span> <span class="string">&#x27;setf &#x27;</span> . <span class="keyword">substitute</span>(<span class="built_in">tolower</span>(syn), <span class="string">&#x27;^vue_&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">      <span class="keyword">endif</span></span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line">  <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endfunction</span></span><br><span class="line"><span class="keyword">function!</span> <span class="title">NERDCommenter_after</span><span class="params">()</span></span><br><span class="line">  <span class="keyword">if</span> <span class="variable">g:ft</span> == <span class="string">&#x27;vue&#x27;</span></span><br><span class="line">    <span class="keyword">setf</span> vue</span><br><span class="line">    <span class="keyword">let</span> <span class="variable">g:ft</span> = <span class="string">&#x27;&#x27;</span></span><br><span class="line">  <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">endfunction</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:vue_disable_pre_processors</span>=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Vim general</span></span><br><span class="line"><span class="keyword">set</span> nofoldenable</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; ==================== Easy Motion ====================</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:EasyMotion_do_mapping</span> = <span class="number">0</span> <span class="comment">&quot; Disable default mappings</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Jump to anywhere you want with minimal keystrokes, with just one key binding.</span></span><br><span class="line"><span class="comment">&quot; `s&#123;char&#125;&#123;label&#125;`</span></span><br><span class="line"><span class="comment">&quot; nmap &lt;space&gt; &lt;Plug&gt;(easymotion-overwin-f)</span></span><br><span class="line"><span class="comment">&quot; or</span></span><br><span class="line"><span class="comment">&quot; `s&#123;char&#125;&#123;char&#125;&#123;label&#125;`</span></span><br><span class="line"><span class="comment">&quot; Need one more keystroke, but on average, it may be more comfortable.</span></span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;space&gt;</span>s <span class="symbol">&lt;Plug&gt;</span>(easymotion-overwin-f2)</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; &lt;space&gt;f&#123;char&#125; to move to &#123;char&#125;</span></span><br><span class="line"><span class="keyword">map</span>  <span class="symbol">&lt;space&gt;</span><span class="keyword">f</span> <span class="symbol">&lt;Plug&gt;</span>(easymotion-<span class="keyword">bd</span>-<span class="keyword">f</span>)</span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;space&gt;</span><span class="keyword">f</span> <span class="symbol">&lt;Plug&gt;</span>(easymotion-overwin-<span class="keyword">f</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Move to line</span></span><br><span class="line"><span class="keyword">map</span> <span class="symbol">&lt;space&gt;</span>L <span class="symbol">&lt;Plug&gt;</span>(easymotion-<span class="keyword">bd</span>-jk)</span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;space&gt;</span>L <span class="symbol">&lt;Plug&gt;</span>(easymotion-overwin-<span class="built_in">line</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Move to word</span></span><br><span class="line"><span class="keyword">map</span>  <span class="symbol">&lt;space&gt;</span><span class="keyword">w</span> <span class="symbol">&lt;Plug&gt;</span>(easymotion-<span class="keyword">bd</span>-<span class="keyword">w</span>)</span><br><span class="line"><span class="keyword">nmap</span> <span class="symbol">&lt;space&gt;</span><span class="keyword">w</span> <span class="symbol">&lt;Plug&gt;</span>(easymotion-overwin-<span class="keyword">w</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; Turn on case insensitive feature</span></span><br><span class="line"><span class="keyword">let</span> <span class="variable">g:EasyMotion_smartcase</span> = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&quot; JK motions: Line motions</span></span><br><span class="line"><span class="keyword">map</span> <span class="symbol">&lt;space&gt;</span><span class="keyword">j</span> <span class="symbol">&lt;Plug&gt;</span>(easymotion-<span class="keyword">j</span>)</span><br><span class="line"><span class="keyword">map</span> <span class="symbol">&lt;space&gt;</span><span class="keyword">k</span> <span class="symbol">&lt;Plug&gt;</span>(easymotion-<span class="keyword">k</span>)</span><br><span class="line"><span class="comment">&quot; ==================== Easy Motion ====================</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;Keep search pattern at the center of the screen.&quot;</span></span><br><span class="line"><span class="keyword">nnoremap</span> <span class="symbol">&lt;silent&gt;</span> n nzz</span><br><span class="line"><span class="keyword">nnoremap</span> <span class="symbol">&lt;silent&gt;</span> <span class="keyword">N</span> Nzz</span><br><span class="line"><span class="keyword">nnoremap</span> <span class="symbol">&lt;silent&gt;</span> * *zz</span><br><span class="line"><span class="keyword">nnoremap</span> <span class="symbol">&lt;silent&gt;</span> # #zz</span><br><span class="line"><span class="keyword">nnoremap</span> <span class="symbol">&lt;silent&gt;</span> g* g*zz</span><br></pre></td></tr></table></figure>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://blog.stark-x.cn">Stark-X</a>
+            <p>原文链接：<a href="https://blog.stark-x.cn/Tools/the-great-vim.html">https://blog.stark-x.cn/Tools/the-great-vim.html</a>
+            <p>发表日期：<a href="https://blog.stark-x.cn/Tools/the-great-vim.html">August 31st 2018, 8:00:00 pm</a>
+            <p>更新日期：<a href="https://blog.stark-x.cn/Tools/the-great-vim.html">April 10th 2022, 9:43:38 pm</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href= "/Solutions/Local-kubernetes-cluster-with-kubeadm-vagrant-and-virtualbox.html" title= "使用Kubeadm, Vagrant, Virtualbox部署本地Kubernetes集群">
+                    <div class="nextTitle">使用Kubeadm, Vagrant, Virtualbox部署本地Kubernetes集群</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/Solutions/Use-kolla-ansible-deploy-OpenStack.html" title= "使用 kolla-ansible 部署 OpenStack">
+                    <div class="prevTitle">使用 kolla-ansible 部署 OpenStack</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+    <div id="lv-container" data-id="city" data-uid= MTAyMC8zODU2MC8xNTA4OA==>
+        <script type="text/javascript">
+            (function (d, s) {
+                var j, e = d.getElementsByTagName(s)[0];
+                if (typeof LivereTower === 'function') { return; }
+                j = d.createElement(s);
+                j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                j.async = true;
+
+                e.parentNode.insertBefore(j, e);
+            })(document, 'script');
+        </script>
+        <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- gitalk评论 -->
+
+    <!-- utteranc评论 -->
+
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <script>
+      (function(){
+        var time = document.getElementsByClassName('post-intro-time')[0]
+        if (time === undefined) { return; }
+        var post = document.getElementsByTagName("article")[0]
+        if (post === undefined) { return; }
+
+        var pubTime = new Date(time.innerText)
+        var now = Date.now()
+        var interval = parseInt(now - pubTime)
+        var days = parseInt(interval / 86400000)
+        var outdated_threshold = parseInt(180)
+        if (interval > outdated_threshold*24*3600*1000){
+          post.innerHTML = '<div class="note note-warning" style="font-size:0.9rem"><p>' +
+            '<div class="title">文章时效性提示</div><p>这是一篇发布于 ' + days + ' 天前的文章，部分信息可能已发生改变，请注意甄别。' +
+            '</p></p></div>' + post.innerHTML;
+        }
+      })();
+  </script>
+  
+</main>
+
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:&#000120;&#0000105;&#0000097;&#x00006f;&#x00006a;&#105;&#101;&#122;&#104;&#105;&#050;&#0064;&#00103;&#000109;&#97;&#0000105;&#00000108;&#46;&#99;&#00000111;&#x6d;" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Stark-X" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="https://stackoverflow.com/users/8318455/stark" class="iconfont-archer stack-overflow" target="_blank" title=stack-overflow></a>
+            
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="https://www.v2ex.com/member/StarkXiao" class="iconfont-archer v2ex" target="_blank" title=v2ex></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title=rss></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">入门教程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6"><span class="toc-number">2.</span> <span class="toc-text">进阶</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#As-IDE"><span class="toc-number">3.</span> <span class="toc-text">As IDE</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#vimrc-%E4%BD%8D%E7%BD%AE"><span class="toc-number">3.1.</span> <span class="toc-text">vimrc 位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%92%E4%BB%B6"><span class="toc-number">3.2.</span> <span class="toc-text">插件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%85%8D%E7%BD%AE"><span class="toc-number">4.</span> <span class="toc-text">参考配置</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 7
+        </div>
+        <!-- search  -->
+        
+            <div class="site-search popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2020 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span><a class="archive-post-title" href= "/Basic/http-2-0.html" >HTTP/2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href= "/Develop/Using-Mockito-to-partially-mock-a-class.html" >使用 Mockito mock 类的一部分 [译]</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/06</span><a class="archive-post-title" href= "/troubleshoot/shell-value-too-great-for-base-error-token-is-08.html" >shell - value too great for base (error token is "08")</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/04</span><a class="archive-post-title" href= "/Solutions/local-kubernetes-cluster-with-kubeadm-vagrant-and-virtualbox-tldr.html" >使用Kubeadm, Vagrant, Virtualbox部署本地Kubernetes集群 - TL;DR</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span><a class="archive-post-title" href= "/Solutions/Local-kubernetes-cluster-with-kubeadm-vagrant-and-virtualbox.html" >使用Kubeadm, Vagrant, Virtualbox部署本地Kubernetes集群</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/31</span><a class="archive-post-title" href= "/Tools/the-great-vim.html" >『上古神器』Vim</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/01</span><a class="archive-post-title" href= "/Solutions/Use-kolla-ansible-deploy-OpenStack.html" >使用 kolla-ansible 部署 OpenStack</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="Vim"><span class="iconfont-archer">&#xe606;</span>Vim</span>
+    
+        <span class="sidebar-tag-name" data-tags="network"><span class="iconfont-archer">&#xe606;</span>network</span>
+    
+        <span class="sidebar-tag-name" data-tags="Kubernetes"><span class="iconfont-archer">&#xe606;</span>Kubernetes</span>
+    
+        <span class="sidebar-tag-name" data-tags="Vagrant"><span class="iconfont-archer">&#xe606;</span>Vagrant</span>
+    
+        <span class="sidebar-tag-name" data-tags="Ops"><span class="iconfont-archer">&#xe606;</span>Ops</span>
+    
+        <span class="sidebar-tag-name" data-tags="Cloud"><span class="iconfont-archer">&#xe606;</span>Cloud</span>
+    
+        <span class="sidebar-tag-name" data-tags="OpenStack"><span class="iconfont-archer">&#xe606;</span>OpenStack</span>
+    
+        <span class="sidebar-tag-name" data-tags="翻译"><span class="iconfont-archer">&#xe606;</span>翻译</span>
+    
+        <span class="sidebar-tag-name" data-tags="java"><span class="iconfont-archer">&#xe606;</span>java</span>
+    
+        <span class="sidebar-tag-name" data-tags="mock"><span class="iconfont-archer">&#xe606;</span>mock</span>
+    
+        <span class="sidebar-tag-name" data-tags="http"><span class="iconfont-archer">&#xe606;</span>http</span>
+    
+        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
+    
+        <span class="sidebar-tag-name" data-tags="疑难杂症"><span class="iconfont-archer">&#xe606;</span>疑难杂症</span>
+    
+        <span class="sidebar-tag-name" data-tags="Coding"><span class="iconfont-archer">&#xe606;</span>Coding</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="troubleshoot"><span class="iconfont-archer">&#xe60a;</span>troubleshoot</span>
+    
+        <span class="sidebar-category-name" data-categories="Solutions"><span class="iconfont-archer">&#xe60a;</span>Solutions</span>
+    
+        <span class="sidebar-category-name" data-categories="Develop"><span class="iconfont-archer">&#xe60a;</span>Develop</span>
+    
+        <span class="sidebar-category-name" data-categories="Basic"><span class="iconfont-archer">&#xe60a;</span>Basic</span>
+    
+        <span class="sidebar-category-name" data-categories="Tools"><span class="iconfont-archer">&#xe60a;</span>Tools</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Stark-X"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+        <div class="site-search">
+  <div class="algolia-popup popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="iconfont-archer">&#xe609;</i>
+    </span>
+  </div>
+</div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.8.3/dist/instantsearch.production.min.js" integrity="sha256-LAGhRRdtVoD6RLo2qDQsU2mp+XVSciKRC8XPOBWmofM=" crossorigin="anonymous"></script>
+        <script src="/scripts/search.js" defer></script>
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+

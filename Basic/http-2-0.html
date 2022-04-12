@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <!-- title -->
+
+
+
+
+<!-- keywords -->
+
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" >
+    <meta name="author" content="Stark-X">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Stark-X">
+    
+    <meta name="keywords" content="http/2,network,基础知识,hexo,hexo-theme,hexo-blog,stark-x,blog,博客">
+    
+    <meta name="description" content="">
+    <meta name="description" content="HTTP&#x2F;2（曾用名：HTTP&#x2F;2.0[1]），改进的目标是使得应用更快，更简单，更稳定，它把以前针对 HTTP&#x2F;1.1 作出的优化方案内置于[[TCP 协议#传输层]]中，使得进行更多的优化成为可能。 HTTP&#x2F;2 的主要改进方向是通过支持请求、响应复用以减少延迟。为了减少协议开销，引入了“二进制分帧层”，增加了对请求的优先级和服务器推送的支持。 HTTP&#x2F;2 没有对 HTTP&#x2F;1.1 的概">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP&#x2F;2">
+<meta property="og:url" content="https://blog.stark-x.cn/Basic/http-2-0.html">
+<meta property="og:site_name" content="Stark-X&#39;s Blog">
+<meta property="og:description" content="HTTP&#x2F;2（曾用名：HTTP&#x2F;2.0[1]），改进的目标是使得应用更快，更简单，更稳定，它把以前针对 HTTP&#x2F;1.1 作出的优化方案内置于[[TCP 协议#传输层]]中，使得进行更多的优化成为可能。 HTTP&#x2F;2 的主要改进方向是通过支持请求、响应复用以减少延迟。为了减少协议开销，引入了“二进制分帧层”，增加了对请求的优先级和服务器推送的支持。 HTTP&#x2F;2 没有对 HTTP&#x2F;1.1 的概">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://img-cdn.xjztest.com/binary_frame.png.png">
+<meta property="og:image" content="http://img-cdn.xjztest.com/http2_frame_stream_message.png.png">
+<meta property="og:image" content="http://img-cdn.xjztest.com/http2_connecting.png.png">
+<meta property="og:image" content="http://img-cdn.xjztest.com/http2_multiplexing.png.png">
+<meta property="og:image" content="http://img-cdn.xjztest.com/http2_priority_tree.png.png">
+<meta property="og:image" content="http://img-cdn.xjztest.com/http2_server_push.png.png">
+<meta property="og:image" content="http://img-cdn.xjztest.com/http2_headers_hpack.png.png">
+<meta property="article:published_time" content="2020-07-03T10:00:58.000Z">
+<meta property="article:modified_time" content="2022-04-10T13:43:38.872Z">
+<meta property="article:author" content="Stark-X">
+<meta property="article:tag" content="network">
+<meta property="article:tag" content="http">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img-cdn.xjztest.com/binary_frame.png.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    
+    <title>HTTP/2 · Stark-X&#39;s Blog</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href= "/css/style.css?v=20210204" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="stylesheet" href= "/css/mobile.css?v=20210204" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href= "/assets/favicon.ico" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script" />
+    <link rel="preload" href="/scripts/main.js?v=20210204" as="script" />
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/js/all.min.js"  data-auto-replace-svg="nest" ></script>
+    
+        <!-- algolia -->
+        <script>
+            
+            var hits = JSON.parse('{"per_page":10}')
+            var labels = JSON.parse('{"input_placeholder":"Search for Posts","hits_empty":"We did not find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}')
+
+            var algolia = {
+                appId: 'K1YQXDVE38',
+                apiKey: 'c6406e3722b79ee948199cfde68931e8',
+                indexName: 'my-hexo-blog',
+                hits: hits,
+                labels: labels
+            }
+        </script>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b4324daa63fffc90868f64602c39f764";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    
+    <!-- 谷歌统计  -->
+    
+    <script>
+        (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-123254244-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+    
+<meta name="generator" content="Hexo 6.1.0"><link rel="alternate" href="/atom.xml" title="Stark-X's Blog" type="application/atom+xml">
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >Stark-X&#39;s Blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">HTTP/2</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href=/>Stark-X's Blog</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="
+
+
+
+
+
+
+
+height:50vh;
+">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(https://res.cloudinary.com/stark/image/upload/v1531667285/Forrest-And-Mountains-Illustration_gfgtys.png)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            HTTP/2
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "network">network</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags = "http">http</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">4.1k</span>阅读时长: <span class="post-count reading-time">14 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2020/07/03</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <!-- toc -->
+<!-- Description to show on index here  -->
+<p>HTTP/2（曾用名：HTTP/2.0<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>），改进的目标是使得应用更快，更简单，更稳定，它把以前针对 HTTP/1.1 作出的优化方案内置于[[TCP 协议#传输层]]中，使得进行更多的优化成为可能。</p>
+<p>HTTP/2 的主要改进方向是通过支持请求、响应复用以减少延迟。为了减少协议开销，引入了“二进制分帧层”，增加了对请求的优先级和服务器推送的支持。</p>
+<p>HTTP/2 没有对 HTTP/1.1 的概念进行改动，它改动的是数据格式化（分帧）以及客户端与服务端传输的方式。通过这两项改动，现有的应用不需要做修改，就可以在新的协议下运行。</p>
+<p>为什么不叫 HTTP1.2 ？因为HTTP/2 引入的“二进制分帧层”与以前的 HTTP 传输的内容的实现不兼容，所以更改了主版本号。</p>
+<span id="more"></span>
+<h2 id="SPDY-与-HTTP-2">SPDY 与 HTTP/2</h2>
+<p>SPDY 是 2009 年，由 Google 开发的一个实验性协议，目标是不更改现有应用的情况下，减少 HTTP/1.1 的加载延迟。2012 年，该协议开始被主流的浏览器支持，越来越多的使用使得它具备成为标准的条件。因此，HTTP 工作组在吸取 SPDY 的优点之后，以 SPDY 为基础设立了新的 HTTP 协议，也就是 HTTP/2。</p>
+<p>在之后的三年，SPDY 作为 HTTP/2 的实验分支，并行开发，直至 2015 年初，IESG 批准发布 HTTP/2，Google 决定于 2016 年初停止对 SPDY 的支持。</p>
+<h2 id="HTTP-2-的设计">HTTP/2 的设计</h2>
+<p>HTTP/1.x 很简单，但是由于它的简单，在应用性能方面就会有一些牺牲，例如以下的一些缺陷，</p>
+<ul>
+<li>客户端需要建立多个连接实现并发</li>
+<li>请求头、响应头是纯文本的，且没进行压缩</li>
+<li>不支持请求优先级</li>
+<li>…</li>
+</ul>
+<p>为了解决这些问题的同时，不影响现有的应用，HTTP/2 没有对 HTTP 的核心概念进行变更，所以，HTTP/2 仍然是 HTTP 的拓展，而不是替代。</p>
+<h3 id="二进制分帧层">二进制分帧层</h3>
+<p>以下的图简单的说明了 HTTP 消息的变化</p>
+<p><img src="http://img-cdn.xjztest.com/binary_frame.png.png" alt="binary_frame"></p>
+<p>“层”指的是给套接字与应用使用的，经过优化的新编码机制。这种新的编码方式在不改变原来的 HTTP 语义的前提下，把原来 HTTP/1.x 使用的纯文本分割成多个二进制帧，因此，只使用 HTTP/1.x 的客户端/服务端无法与只使用 HTTP/2 的客户端/服务端通讯。</p>
+<p>二进制分帧层的实现是 HTTP/2 所有其它功能和性能优化的基础。</p>
+<h3 id="数据流、消息、帧">数据流、消息、帧</h3>
+<p>新的机制带来了三个新的概念：</p>
+<ul>
+<li><em>数据流 / 流 （stream）</em>：双向字节流，可以承载多条消息</li>
+<li><em>消息</em>：与请求/响应对应的完整的一些列的<em>帧</em></li>
+<li><em>帧</em>：HTTP/2 的最小通信单位，至少包含<em>帧头（Headers Frame）</em></li>
+</ul>
+<p>相互的关系：</p>
+<ul>
+<li>只需要一个 TCP 连接，此连接可以承载任意数量的<em>数据流</em></li>
+<li><em>数据流</em>用于承载双向<em>信息</em>，每个<em>数据流</em>都包含一个唯一的标识符以及可选的优先级信息</li>
+<li>每一条<em>消息</em>都是一条逻辑 HTTP 请求（如请求/响应），包含一个或者多个帧</li>
+<li>来自不同的<em>帧</em>可以交错发送，然后根据每个<em>帧头</em>的标识符重新组装（与[[TCP 数据包]]类似）</li>
+</ul>
+<p><img src="http://img-cdn.xjztest.com/http2_frame_stream_message.png.png" alt="http2_frame_stream_message"></p>
+<h4 id="帧的结构">帧的结构</h4>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">╔═════════════════════════╦════════════╗</span><br><span class="line">║ Length (24)             ║   Type (8) ║</span><br><span class="line">╠═══════════╦═════════════╩════════════╣</span><br><span class="line">║ Flags (8) ║                          ║</span><br><span class="line">╠═══════╦═══╩══════════════════════════╣</span><br><span class="line">║ R (1) ║       Stream Identifier (31) ║</span><br><span class="line">╠═══════╩══════════════════════════════╣</span><br><span class="line">║ Frame payload (N)                    ║</span><br><span class="line">╚══════════════════════════════════════╝</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Length，3 字节，表示帧 payload 的长度。（范围2^ 14~2^24-1 字节）默认帧大小为 2^14 字节，可在 <code>SETTINGS</code> 帧中设置。</li>
+<li>Type，1 字节，帧类型</li>
+<li>Flags，1 字节，帧的相关配置</li>
+<li>R，1 位，保留位</li>
+<li>Stream Identifier，31 位， <em>数据流</em>的唯一 ID</li>
+<li>Frame Payload，长度由 Length 定义</li>
+</ul>
+<p>相对于 HTTP/1.x，HTTP/2 在一开始就知道分配多少的内存，只需要提前分配好内存即可。而前者，需要不断地读取请求流，根据内容开辟新的内存（不连续的内存带来的性能影响可以谷歌一下），而且前者在处理完一个请求流之前，不能停止解析。</p>
+<h3 id="请求-响应-复用">请求/响应 复用</h3>
+<p>在 HTTP/1.x 中，客户端需要发起多个并行的连接的时候，会有多个 TCP 连接被建立。这是 HTTP/1.x 的模型，每个 TCP 连接只处理一个请求+响应，而这种模型会导致<strong>队首阻塞（Head-of-line-blocking, AKA. HOL）</strong> 问题。<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+<p><em>二进制分帧层</em>解决了这个问题：客户端与服务端之间的 HTTP 消息被拆分成多个互不依赖的<em>帧</em>，交错发送，在另一端重新按序列顺序组装起来。</p>
+<p><img src="http://img-cdn.xjztest.com/http2_connecting.png.png" alt="http2_connecting"></p>
+<p>在这种模式下， 一个 TCP 连接就能同时传输多个 HTTP请求/响应，这个加强带来了巨大的性能提升。</p>
+<p><img src="http://img-cdn.xjztest.com/http2_multiplexing.png.png" alt="http2_multiplexing"></p>
+<p>从左到右，效率越来越高。</p>
+<ol>
+<li>一个请求紧接一个响应，较为低效。</li>
+<li>在 HTTP/1.1，应用了 Pipeling 技术，请求一次性全部发送，客户端等待响应。</li>
+<li>Pipelineing 技术还是有个问题，如果第一个请求的处理有问题，后续的请求即使处理完了，还是需要等待第一个请求处理完成，即 HOL Blocking。</li>
+<li>HTTP/2 提出的<em>多路复用</em>技术，解决了这个问题。</li>
+</ol>
+<p>使用这种多路复用技术带来了以下的特性使得我们的应用速度更快，开发更简单，部署成本更低。</p>
+<ul>
+<li>并行交错地发送/接收请求/响应，互不影响</li>
+<li>只使用一个 TCP 连接处理多个请求/响应，减轻了服务器/客户端的负担</li>
+<li>免除了很多针对 HTTP/1.x 所做的优化</li>
+<li>免除不必要的延迟、等待，从而减少了页面加载时间</li>
+<li>等等···</li>
+</ul>
+<h3 id="数据流优先级">数据流优先级</h3>
+<p>HTTP/2 赋予了每个<em>数据流</em>一个介于 1~256 整数的优先级，以及显式的依赖关系。</p>
+<p>通过这两项构建的”优先级树“被用于系统决定资源的分配（CPU、内存等）。</p>
+<p><img src="http://img-cdn.xjztest.com/http2_priority_tree.png.png" alt="http2_priority_tree"></p>
+<p>以上图为例，每个节点代表一个<em>数据流</em>，<em>数据流</em>处理的优先级依照”先处理和传输响应 D，然后再处理和传输响应 C“。在资源分配方面，则是根据权重占比分配，如：针对从左到右的第一张图，A 获得的资源为 <code>12/(12+4)</code>，B 获得的资源为 <code>4/(12+4)</code>。</p>
+<p>同样是以上图为例，从左到右依次为：</p>
+<ol>
+<li>A、B 没有指定父依赖，那它们会依赖于一个隐式的”根数据流“</li>
+<li>C 依赖于 D，D 依赖于根数据流，所以，D 会有更高的优先级获取到完整的资源分配</li>
+<li>优先级 D &gt; C &gt; A / B，A 获得的资源为 <code>12/(12+4)</code>，B 获得的资源为 <code>4/(12+4)</code>。</li>
+<li>优先级 D &gt; C / E &gt; A / B，···</li>
+</ol>
+<p>通过上述的权重及依赖关系，我们可以明确地表达资源的优先级，另外，HTTP/2 还允许客户端随时更新这些优先级，更进一步地优化客户端的性能。</p>
+<p>需要注意的是，优先级不是要求，不能被用于强制处理顺序或者传输顺序，因为，我们不希望优先级较高的资源受到阻止的时候，还阻止低优先级的资源的处理。</p>
+<h3 id="一个源（Origin）一个连接">一个源（Origin）一个连接</h3>
+<p>在有了新的<em>二进制分帧层</em>机制后，HTTP/2 不再依赖多个 TCP 连接去并行复用<em>数据流</em>，因此，所有 HTTP/2 的连接都是持久的，而且每个源只需一个 TCP 连接。</p>
+<p>HTTP 的请求大都是短暂的，而 TCP 协议却是针对长时间的批量数据做了优化，在使用 HTTP/2 之后，可以很好地化解这个矛盾，更少的连接可以减少使用的资源，在同等的配置下，使用了 HTTP/2 的服务器能有效的减少网络延迟，提高通量（连接吞吐量），从而降低成本。<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
+<h3 id="流控制">流控制</h3>
+<p>因为 HTTP 1.X 一个连接只使用一个 TCP 连接，直接使用 TCP 的 <code>流控制</code> <sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup>无法精准地控制，也无法提供相应的 API 对单个 TCP 内的数据流进行调节。为了解决这个问题，HTTP/2 提供了一系列的概念，从而使得客户端和服务端有能力实现自己的<em>数据流</em>级别的和<em>连接</em>级别的 <code>流控制</code>：</p>
+<ul>
+<li><code>流控制</code>是<strong>定向的</strong>。每个连接接收方都可以根据自身需要选择为每个数据流或者整个连接设置任意的窗口大小。</li>
+<li><code>流控制</code> <strong>基于信用</strong>。每个接收方都可以公布其初始连接和数据流流控制窗口（以字节为单位），每当发送方发出 <code>DATA</code> 帧时都会减小，在接收方发出 <code>WINDOW_UPDATE</code> 帧时增大。</li>
+<li><code>流控制</code> <strong>无法停用</strong>。建立 HTTP/2 连接后，客户端将与服务器交换 <code>SETTINGS</code> 帧，这会在两个方向上设置流控制窗口。 流控制窗口的默认值设为 65535 字节，但是接收方可以设置一个较大的最大窗口大小（2^31-1 字节），并在接收到任意数据时通过发送 <code>WINDOW_UPDATE</code> 帧来维持这一大小。</li>
+<li><code>流控制</code>是<strong>逐跃点控制</strong>，而非端到端控制。即，可信中介/代理可以使用它来控制资源使用，以及基于自身条件和启发式算法实现资源分配机制。</li>
+</ul>
+<p>HTTP/2 未指定任何特定算法来实现流控制，但是，它提供了简单的相关概念，推迟了客户端和服务端对此的实现，通过实现自定义的策略，服务端、客户端可以实现更好的传输规则，以提高体验。如：通过让浏览器获取低分辨率的缩略图之后，把<em>控制窗口</em>减少为零，等其它关键项加载完毕之后，再重新恢复<em>控制窗口</em>。</p>
+<h3 id="服务器推送">服务器推送</h3>
+<p>HTTP/2 还新增了一个功能，服务端可以对客户端的一个请求发送多个响应。</p>
+<p><img src="http://img-cdn.xjztest.com/http2_server_push.png.png" alt="http2_server_push"></p>
+<p>一个典型的 Web App 会包含多种资源，客户端需要获得完整的文档（如：index.html）之后，才知道需要什么其它的内容。那么如果可以在第一次请求服务端时，就把其它资源都一并发送回客户端，这额外的延迟等待就可以被省去了。</p>
+<p>除了提前推送需要用到的资源这个特性之外，<em>服务器推送</em>还有以下的特性：</p>
+<ul>
+<li>推送的资源由客户端缓存</li>
+<li>推送的资源可以在不同的页面之间重用</li>
+<li>与其它资源的请求组成<em>响应复用</em></li>
+<li>由服务端设定优先级</li>
+<li>可以被客户端拒绝</li>
+</ul>
+<h4 id="PUSH-PROMISE-101"><code>PUSH_PROMISE</code> 101</h4>
+<p>如果服务端决定推送一个对象，则一个<code>PUSH_PROMISE</code> 帧会被构建，并比<code>DATA</code>帧更早一步发送到客户端。在客户端收到 <code>PUSH_PROMISE</code> 帧后，它可以根据情况通过发送<code>RST_STREAM</code>帧选择拒绝数据流。（如：资源已经在本地缓存）</p>
+<p>一个<code>PUSH_PROMISE</code> 帧有以下属性：</p>
+<ul>
+<li>包含所需要推送的资源的 HTTP Headers</li>
+<li>被发送的对象必须确保是可被缓存的</li>
+<li><code>PUSH_PROMISE</code> 帧使用对应的请求的流的 ID 构造响应的 <code>PUSH_PROMISE</code> 帧</li>
+<li><code>PUSH_PROMISE</code> 帧会声明接下来发送的响应（推送的资源）所使用的的流的 ID （都为偶数）<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup></li>
+<li>方法必须是幂等的，即请求不能为 POST 这种，可能改变服务端资源状态的方法</li>
+</ul>
+<h3 id="标头（Header）压缩">标头（Header）压缩</h3>
+<p>每个 HTTP 请求都有一组标头，指明了传输的资源及其属性，在 HTTP/1.x 中，标头都是纯文本，以回车换行符（<code>CRLF</code>）分割，这些元数据通常会给使得实际传输的数据增加 500-800 字节，如果包含了 cookies，则有时候会增加上千字节。</p>
+<p>为了减少这个开销，HTTP/2 使用了 <code>HPACK</code> <sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup>压缩格式对请求 / 响应的标头进行压缩，这种压缩格式采用了两种简单但是强大的技术手段：</p>
+<ol>
+<li>通过静态[[霍夫曼编码（huffman coding）]]对标头进行编码，从而减少了数据量</li>
+<li>通过要求客户端、服务端同时维护一个包含了之前使用过的标头字段的索引列表，减少了冗余的标头字段传输</li>
+</ol>
+<p><img src="http://img-cdn.xjztest.com/http2_headers_hpack.png.png" alt="http2_headers_hpack"></p>
+<p>如上图，在一个新的<em>数据流</em>中，只需要传输 <code>path</code> 字段的内容，减少了大约六分之五的数据量。</p>
+<p>为了做进一步的优化，HPACK 压缩包含一个静态表以及一个动态表</p>
+<ul>
+<li>静态表包含了常用的标头</li>
+<li>动态表初始为空，将根据情况在采用了静态的[[霍夫曼编码（huffman coding）]]之后对列表进行更新。</li>
+</ul>
+<p>注意，在 HTTP/2 的标头中，字段的含义不变，但会有些许差异</p>
+<ul>
+<li>所有的标头字段名都为小写</li>
+<li>请求行从<code>Method Request-URI HTTP-Version</code>拆分成 <code>:method</code>, <code>:scheme</code>, <code>:authority</code>, <code>:path</code></li>
+</ul>
+<h3 id="确认服务器支持-HTTP-2">确认服务器支持 HTTP/2</h3>
+<h4 id="协议发现">协议发现</h4>
+<ol>
+<li>非加密通讯时，使用 <code>Upgrade</code> 请求显示表明期望使用 HTTP/2，如果服务器支持，会返回 <code>101 Switching Protocols</code></li>
+<li>如果是 TLS 加密的通讯，客户端在 [[TCP 三次握手，四次挥手（TCP Handshake）#ClientHello]] 消息中设置 ALPN（Application-Layer Protocol Negotiation，应用层协议协商）来显示表明期望使用 HTTP/2</li>
+</ol>
+<h4 id="Double-Confirm">Double Confirm</h4>
+<p>客户端会发送一个特殊字节流 <code>Connection Preface</code> 作为第一个数据。<code>Connection Preface</code> 是一个纯文本的数据：<code>0x505249202a20485454502f322e300d0a0d0a534d0d0a0d0a </code>，解析为 [[ASCII 编码]]：<code>PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n</code>。这是 HTTP/1.x 的格式，PRI 是请求方法，如果不支持 HTTP/2，则服务端会返回方法错误；而支持 HTTP/2 的服务端会返回一个<code>SETTING</code>帧来回应紧接着 <code>Connection Preface</code> 的来自于客户端的<code>SETTING</code>帧，以表明自己支持 HTTP/2，这样客户端就知道服务端支不支持 HTTP/2 了。</p>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li>Google - HTTP/2 简介： <a target="_blank" rel="noopener" href="https://developers.google.com/web/fundamentals/performance/http2?hl=zh-cn">https://developers.google.com/web/fundamentals/performance/http2?hl=zh-cn</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.im/post/5da16e9ef265da5b76373d0e">https://juejin.im/post/5da16e9ef265da5b76373d0e</a></li>
+</ul>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p><em>HTTP/2.0</em>：根据 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/HTTP/2#Development_milestones">wikipedia</a> 的记录，HTTP/2 在 2012 年初，曾用 HTTP/2.0 作为名字，在 2015 年 1 月之后，正式命名为 HTTP/2。 <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>一个要求按顺序传送数据的队列的第一个数据包（队头）受阻而导致后续的所有数据包受阻。一种解决办法是，使用虚拟的输出队列。 <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>维持连接需要资源，更少的连接，代表了更少的内存占用；网络拥塞情况减轻，[[慢启动（slow start）]] 时间减少，拥塞和丢包恢复速度加快；避免了频繁的 [[TCP 三次握手，四次挥手（TCP Handshake）]]。 <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn4" class="footnote-item"><p><code>流控制</code> 是一种阻止发送方向接收方发送大量数据的机制，以免超出后者的需求或处理能力：发送方可能非常繁忙、处于较高的负载之下，也可能仅仅希望为特定数据流分配固定量的资源。 例如，客户端可能请求了一个具有较高优先级的大型视频流，但是用户已经暂停视频，客户端现在希望暂停或限制从服务器的传输，以免提取和缓冲不必要的数据。更多内容，请参阅 [[流控制（Flow Control）]] <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn5" class="footnote-item"><p>客户端的流从 1 开始，之后每个新的流都使用加 2 之后的 ID，即都是奇数。而服务端主动推送的流的 ID 从 2 开始，之后每个新的推送的流都使用加 2 之后的 ID，即都是偶数。这样的处理可以让双方判断哪些流是由服务端推送的。0 是保留的流 ID，用于连接级的控制消息。 <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn6" class="footnote-item"><p>HPACK 是种表查找压缩方案，它利用霍夫曼编码获得接近 <code>GZIP</code> 的压缩率。 <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://blog.stark-x.cn">Stark-X</a>
+            <p>原文链接：<a href="https://blog.stark-x.cn/Basic/http-2-0.html">https://blog.stark-x.cn/Basic/http-2-0.html</a>
+            <p>发表日期：<a href="https://blog.stark-x.cn/Basic/http-2-0.html">July 3rd 2020, 6:00:58 pm</a>
+            <p>更新日期：<a href="https://blog.stark-x.cn/Basic/http-2-0.html">April 10th 2022, 9:43:38 pm</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href= "/Develop/Using-Mockito-to-partially-mock-a-class.html" title= "使用 Mockito mock 类的一部分 [译]">
+                    <div class="prevTitle">使用 Mockito mock 类的一部分 [译]</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+    <div id="lv-container" data-id="city" data-uid= MTAyMC8zODU2MC8xNTA4OA==>
+        <script type="text/javascript">
+            (function (d, s) {
+                var j, e = d.getElementsByTagName(s)[0];
+                if (typeof LivereTower === 'function') { return; }
+                j = d.createElement(s);
+                j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+                j.async = true;
+
+                e.parentNode.insertBefore(j, e);
+            })(document, 'script');
+        </script>
+        <noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!-- gitalk评论 -->
+
+    <!-- utteranc评论 -->
+
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <script>
+      (function(){
+        var time = document.getElementsByClassName('post-intro-time')[0]
+        if (time === undefined) { return; }
+        var post = document.getElementsByTagName("article")[0]
+        if (post === undefined) { return; }
+
+        var pubTime = new Date(time.innerText)
+        var now = Date.now()
+        var interval = parseInt(now - pubTime)
+        var days = parseInt(interval / 86400000)
+        var outdated_threshold = parseInt(180)
+        if (interval > outdated_threshold*24*3600*1000){
+          post.innerHTML = '<div class="note note-warning" style="font-size:0.9rem"><p>' +
+            '<div class="title">文章时效性提示</div><p>这是一篇发布于 ' + days + ' 天前的文章，部分信息可能已发生改变，请注意甄别。' +
+            '</p></p></div>' + post.innerHTML;
+        }
+      })();
+  </script>
+  
+</main>
+
+            <!-- profile -->
+            
+        </div>
+        <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:&#000120;&#0000105;&#0000097;&#x00006f;&#x00006a;&#105;&#101;&#122;&#104;&#105;&#050;&#0064;&#00103;&#000109;&#97;&#0000105;&#00000108;&#46;&#99;&#00000111;&#x6d;" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/Stark-X" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="https://stackoverflow.com/users/8318455/stark" class="iconfont-archer stack-overflow" target="_blank" title=stack-overflow></a>
+            
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="https://www.v2ex.com/member/StarkXiao" class="iconfont-archer v2ex" target="_blank" title=v2ex></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+            
+                <a href="/atom.xml" class="iconfont-archer rss" target="_blank" title=rss></a>
+            
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#SPDY-%E4%B8%8E-HTTP-2"><span class="toc-number">1.</span> <span class="toc-text">SPDY 与 HTTP&#x2F;2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-2-%E7%9A%84%E8%AE%BE%E8%AE%A1"><span class="toc-number">2.</span> <span class="toc-text">HTTP&#x2F;2 的设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%88%86%E5%B8%A7%E5%B1%82"><span class="toc-number">2.1.</span> <span class="toc-text">二进制分帧层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E3%80%81%E6%B6%88%E6%81%AF%E3%80%81%E5%B8%A7"><span class="toc-number">2.2.</span> <span class="toc-text">数据流、消息、帧</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%A7%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">2.2.1.</span> <span class="toc-text">帧的结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82-%E5%93%8D%E5%BA%94-%E5%A4%8D%E7%94%A8"><span class="toc-number">2.3.</span> <span class="toc-text">请求&#x2F;响应 复用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-number">2.4.</span> <span class="toc-text">数据流优先级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%B8%AA%E6%BA%90%EF%BC%88Origin%EF%BC%89%E4%B8%80%E4%B8%AA%E8%BF%9E%E6%8E%A5"><span class="toc-number">2.5.</span> <span class="toc-text">一个源（Origin）一个连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E6%8E%A7%E5%88%B6"><span class="toc-number">2.6.</span> <span class="toc-text">流控制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8E%A8%E9%80%81"><span class="toc-number">2.7.</span> <span class="toc-text">服务器推送</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#PUSH-PROMISE-101"><span class="toc-number">2.7.1.</span> <span class="toc-text">PUSH_PROMISE 101</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%87%E5%A4%B4%EF%BC%88Header%EF%BC%89%E5%8E%8B%E7%BC%A9"><span class="toc-number">2.8.</span> <span class="toc-text">标头（Header）压缩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AE%E8%AE%A4%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%94%AF%E6%8C%81-HTTP-2"><span class="toc-number">2.9.</span> <span class="toc-text">确认服务器支持 HTTP&#x2F;2</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%8F%E8%AE%AE%E5%8F%91%E7%8E%B0"><span class="toc-number">2.9.1.</span> <span class="toc-text">协议发现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Double-Confirm"><span class="toc-number">2.9.2.</span> <span class="toc-text">Double Confirm</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 7
+        </div>
+        <!-- search  -->
+        
+            <div class="site-search popup-trigger">
+                <span class="iconfont-archer search-icon">&#xe627;</span>
+            </div>
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2020 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span><a class="archive-post-title" href= "/Basic/http-2-0.html" >HTTP/2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href= "/Develop/Using-Mockito-to-partially-mock-a-class.html" >使用 Mockito mock 类的一部分 [译]</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/06</span><a class="archive-post-title" href= "/troubleshoot/shell-value-too-great-for-base-error-token-is-08.html" >shell - value too great for base (error token is "08")</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/04</span><a class="archive-post-title" href= "/Solutions/local-kubernetes-cluster-with-kubeadm-vagrant-and-virtualbox-tldr.html" >使用Kubeadm, Vagrant, Virtualbox部署本地Kubernetes集群 - TL;DR</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span><a class="archive-post-title" href= "/Solutions/Local-kubernetes-cluster-with-kubeadm-vagrant-and-virtualbox.html" >使用Kubeadm, Vagrant, Virtualbox部署本地Kubernetes集群</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/31</span><a class="archive-post-title" href= "/Tools/the-great-vim.html" >『上古神器』Vim</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/01</span><a class="archive-post-title" href= "/Solutions/Use-kolla-ansible-deploy-OpenStack.html" >使用 kolla-ansible 部署 OpenStack</a>
+        </li>
+    
+    </div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="Vim"><span class="iconfont-archer">&#xe606;</span>Vim</span>
+    
+        <span class="sidebar-tag-name" data-tags="network"><span class="iconfont-archer">&#xe606;</span>network</span>
+    
+        <span class="sidebar-tag-name" data-tags="Kubernetes"><span class="iconfont-archer">&#xe606;</span>Kubernetes</span>
+    
+        <span class="sidebar-tag-name" data-tags="Vagrant"><span class="iconfont-archer">&#xe606;</span>Vagrant</span>
+    
+        <span class="sidebar-tag-name" data-tags="Ops"><span class="iconfont-archer">&#xe606;</span>Ops</span>
+    
+        <span class="sidebar-tag-name" data-tags="Cloud"><span class="iconfont-archer">&#xe606;</span>Cloud</span>
+    
+        <span class="sidebar-tag-name" data-tags="OpenStack"><span class="iconfont-archer">&#xe606;</span>OpenStack</span>
+    
+        <span class="sidebar-tag-name" data-tags="翻译"><span class="iconfont-archer">&#xe606;</span>翻译</span>
+    
+        <span class="sidebar-tag-name" data-tags="java"><span class="iconfont-archer">&#xe606;</span>java</span>
+    
+        <span class="sidebar-tag-name" data-tags="mock"><span class="iconfont-archer">&#xe606;</span>mock</span>
+    
+        <span class="sidebar-tag-name" data-tags="http"><span class="iconfont-archer">&#xe606;</span>http</span>
+    
+        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
+    
+        <span class="sidebar-tag-name" data-tags="疑难杂症"><span class="iconfont-archer">&#xe606;</span>疑难杂症</span>
+    
+        <span class="sidebar-tag-name" data-tags="Coding"><span class="iconfont-archer">&#xe606;</span>Coding</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br/>
+    1、请确保node版本大于6.2<br/>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br/>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br/>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="troubleshoot"><span class="iconfont-archer">&#xe60a;</span>troubleshoot</span>
+    
+        <span class="sidebar-category-name" data-categories="Solutions"><span class="iconfont-archer">&#xe60a;</span>Solutions</span>
+    
+        <span class="sidebar-category-name" data-categories="Develop"><span class="iconfont-archer">&#xe60a;</span>Develop</span>
+    
+        <span class="sidebar-category-name" data-categories="Basic"><span class="iconfont-archer">&#xe60a;</span>Basic</span>
+    
+        <span class="sidebar-category-name" data-categories="Tools"><span class="iconfont-archer">&#xe60a;</span>Tools</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Stark-X"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+        <div class="site-search">
+  <div class="algolia-popup popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="iconfont-archer">&#xe609;</i>
+    </span>
+  </div>
+</div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4.8.3/dist/instantsearch.production.min.js" integrity="sha256-LAGhRRdtVoD6RLo2qDQsU2mp+XVSciKRC8XPOBWmofM=" crossorigin="anonymous"></script>
+        <script src="/scripts/search.js" defer></script>
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
