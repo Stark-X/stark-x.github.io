@@ -492,7 +492,7 @@ height:50vh;
 <p>要在本地建立集群，那就先建两个虚拟机吧，这两个虚拟机配置、设定上应该是基本一致的，那就使用 Vagrant 做初始化，环境配置。使用 Vagrant 的一大好处是只需要一份<code>Vagrantfile</code>就可以保证使用它建立起来的虚拟机是一致的，并且自动地把下载镜像、初始化、配置等等全做好了。</p>
 <p>既然是个集群，那它们之间应该可以相互通讯，需要配置一个私有网络；另外，Vagrant 默认创建的网络是 NAT 模式，那要有端口映射，预留端口 10000-&gt;80(master)，10001-&gt;80(node)；根据<a target="_blank" rel="noopener" href="https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/#before-you-begin">官网的介绍</a>，所有节点推荐使用至少2核CPU，2G内存；同样根据<a target="_blank" rel="noopener" href="https://kubernetes.io/docs/setup/independent/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl">官方文档</a>，需要安装 kubelet，kubectl，kubeadm，docker。根据这些条件，就有了下面的<code>Vagrantfile</code>。</p>
 <figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$script</span> = <span class="string">&lt;&lt;-SCRIPT</span></span><br><span class="line"><span class="string">echo &quot;Update and install the kubeadm&quot;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">apt-get update &amp;&amp; apt-get install -y apt-transport-https curl</span></span><br><span class="line"><span class="string">curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -</span></span><br><span class="line"><span class="string">cat &lt;&lt;EOF &gt;/etc/apt/sources.list.d/kubernetes.list</span></span><br><span class="line"><span class="string">deb https://apt.kubernetes.io/ kubernetes-xenial main</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"><span class="string">apt-get update</span></span><br><span class="line"><span class="string">apt-get install -y kubelet kubeadm kubectl docker.io</span></span><br><span class="line"><span class="string">apt-mark hold kubelet kubeadm kubectl</span></span><br><span class="line"><span class="string">usermod -aG docker vagrant</span></span><br><span class="line"><span class="string">kubeadm config images pull</span></span><br><span class="line"><span class="string">SCRIPT</span></span><br><span class="line"></span><br><span class="line">Vagrant.configure(<span class="string">&quot;2&quot;</span>) <span class="keyword">do</span> |<span class="params">config</span>|</span><br><span class="line">  config.vm.provider <span class="string">&quot;virtualbox&quot;</span> <span class="keyword">do</span> |<span class="params">v</span>|</span><br><span class="line">    v.memory = <span class="number">2048</span></span><br><span class="line">    v.cpus = <span class="number">2</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  </span><br><span class="line">  config.vm.define <span class="string">&quot;master&quot;</span>, <span class="symbol">primary:</span> <span class="literal">true</span> <span class="keyword">do</span> |<span class="params">master</span>|</span><br><span class="line">    master.vm.hostname = <span class="string">&quot;k8s-cluster-master&quot;</span></span><br><span class="line">    master.vm.box = <span class="string">&quot;ubuntu/xenial64&quot;</span></span><br><span class="line">    master.vm.network <span class="string">&quot;forwarded_port&quot;</span>, <span class="symbol">guest:</span> <span class="number">80</span>, <span class="symbol">host:</span> <span class="number">10000</span>, <span class="symbol">protocol:</span> <span class="string">&quot;tcp&quot;</span></span><br><span class="line">    master.vm.network <span class="string">&quot;private_network&quot;</span>, <span class="symbol">type:</span> <span class="string">&quot;dhcp&quot;</span></span><br><span class="line">    master.vm.provision <span class="string">&quot;shell&quot;</span>, <span class="symbol">inline:</span> <span class="variable">$script</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  config.vm.define <span class="string">&quot;node&quot;</span> <span class="keyword">do</span> |<span class="params">node</span>|</span><br><span class="line">    node.vm.hostname = <span class="string">&quot;k8s-cluster-node&quot;</span></span><br><span class="line">    node.vm.box = <span class="string">&quot;ubuntu/xenial64&quot;</span></span><br><span class="line">    node.vm.network <span class="string">&quot;forwarded_port&quot;</span>, <span class="symbol">guest:</span> <span class="number">80</span>, <span class="symbol">host:</span> <span class="number">10001</span>, <span class="symbol">protocol:</span> <span class="string">&quot;tcp&quot;</span></span><br><span class="line">    node.vm.network <span class="string">&quot;private_network&quot;</span>, <span class="symbol">type:</span> <span class="string">&quot;dhcp&quot;</span></span><br><span class="line">    node.vm.provision <span class="string">&quot;shell&quot;</span>, <span class="symbol">inline:</span> <span class="variable">$script</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="启动节点-2">启动节点</h2>
+<h2 id="启动节点">启动节点</h2>
 <p>执行命令<code>vagrant up</code>，Vagrant 开始自动下载Ubuntu镜像，并执行我们写在<code>Vagrantfile</code>里的 Shell 脚本，顺利启动后，在当前窗口执行<code>vagrant ssh master</code>，新开一个窗口执行<code>vagrant ssh node</code>分别 ssh 进入到主节点以及工作节点。 <img src="https://i.loli.net/2018/11/14/5bec3c9cd27ad.png" alt="vagrant"><em><small>第一次执行<code>vagrant up</code>会看到更多的信息。</small></em></p>
 <p>使用命令<code>ip a</code>查看当前节点 ip，两个节点互相 ping，检查连通性。</p>
 <h1>部署</h1>
@@ -785,7 +785,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">目标</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">开工</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%96%E5%86%99-Vagrantfile"><span class="toc-number">2.1.</span> <span class="toc-text">编写 Vagrantfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E8%8A%82%E7%82%B9-2"><span class="toc-number">2.2.</span> <span class="toc-text">启动节点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">部署</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Round-1-Kubernetes-%E9%9B%86%E7%BE%A4"><span class="toc-number">3.1.</span> <span class="toc-text">Round 1 - Kubernetes 集群</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Round-1-1-%E5%B7%A5%E4%BD%9C%E8%8A%82%E7%82%B9%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E5%88%B0%E4%B8%BB%E8%8A%82%E7%82%B9"><span class="toc-number">3.1.1.</span> <span class="toc-text">Round 1.1 - 工作节点无法连接到主节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Round-1-2-%E5%B7%A5%E4%BD%9C%E8%8A%82%E7%82%B9-Not-Ready"><span class="toc-number">3.1.2.</span> <span class="toc-text">Round 1.2 - 工作节点 Not Ready</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Round-2-Kubernetes-Dashboard"><span class="toc-number">3.2.</span> <span class="toc-text">Round 2 - Kubernetes Dashboard</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Round-2-1-503"><span class="toc-number">3.2.1.</span> <span class="toc-text">Round 2.1 - 503</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx"><span class="toc-number">3.3.</span> <span class="toc-text">Nginx</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">4.</span> <span class="toc-text">待续</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">目标</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">开工</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%96%E5%86%99-Vagrantfile"><span class="toc-number">2.1.</span> <span class="toc-text">编写 Vagrantfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E8%8A%82%E7%82%B9"><span class="toc-number">2.2.</span> <span class="toc-text">启动节点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">部署</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Round-1-Kubernetes-%E9%9B%86%E7%BE%A4"><span class="toc-number">3.1.</span> <span class="toc-text">Round 1 - Kubernetes 集群</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Round-1-1-%E5%B7%A5%E4%BD%9C%E8%8A%82%E7%82%B9%E6%97%A0%E6%B3%95%E8%BF%9E%E6%8E%A5%E5%88%B0%E4%B8%BB%E8%8A%82%E7%82%B9"><span class="toc-number">3.1.1.</span> <span class="toc-text">Round 1.1 - 工作节点无法连接到主节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Round-1-2-%E5%B7%A5%E4%BD%9C%E8%8A%82%E7%82%B9-Not-Ready"><span class="toc-number">3.1.2.</span> <span class="toc-text">Round 1.2 - 工作节点 Not Ready</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Round-2-Kubernetes-Dashboard"><span class="toc-number">3.2.</span> <span class="toc-text">Round 2 - Kubernetes Dashboard</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Round-2-1-503"><span class="toc-number">3.2.1.</span> <span class="toc-text">Round 2.1 - 503</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx"><span class="toc-number">3.3.</span> <span class="toc-text">Nginx</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">4.</span> <span class="toc-text">待续</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text">参考资料</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -798,12 +798,6 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
-    
-    
-    
-    
-    
-    
     
     
     
@@ -949,19 +943,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="Vim"><span class="iconfont-archer">&#xe606;</span>Vim</span>
     
-        <span class="sidebar-tag-name" data-tags="network"><span class="iconfont-archer">&#xe606;</span>network</span>
-    
         <span class="sidebar-tag-name" data-tags="Cloud"><span class="iconfont-archer">&#xe606;</span>Cloud</span>
     
         <span class="sidebar-tag-name" data-tags="OpenStack"><span class="iconfont-archer">&#xe606;</span>OpenStack</span>
     
         <span class="sidebar-tag-name" data-tags="Ops"><span class="iconfont-archer">&#xe606;</span>Ops</span>
     
-        <span class="sidebar-tag-name" data-tags="http"><span class="iconfont-archer">&#xe606;</span>http</span>
-    
-        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
-    
-        <span class="sidebar-tag-name" data-tags="疑难杂症"><span class="iconfont-archer">&#xe606;</span>疑难杂症</span>
+        <span class="sidebar-tag-name" data-tags="network"><span class="iconfont-archer">&#xe606;</span>network</span>
     
         <span class="sidebar-tag-name" data-tags="Kubernetes"><span class="iconfont-archer">&#xe606;</span>Kubernetes</span>
     
@@ -973,7 +961,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="mock"><span class="iconfont-archer">&#xe606;</span>mock</span>
     
+        <span class="sidebar-tag-name" data-tags="http"><span class="iconfont-archer">&#xe606;</span>http</span>
+    
         <span class="sidebar-tag-name" data-tags="Coding"><span class="iconfont-archer">&#xe606;</span>Coding</span>
+    
+        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
+    
+        <span class="sidebar-tag-name" data-tags="疑难杂症"><span class="iconfont-archer">&#xe606;</span>疑难杂症</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -1008,13 +1002,13 @@ jsonContent:
         <div class="sidebar-panel-categories">
     <div class="sidebar-categories-name">
     
-        <span class="sidebar-category-name" data-categories="troubleshoot"><span class="iconfont-archer">&#xe60a;</span>troubleshoot</span>
-    
         <span class="sidebar-category-name" data-categories="Solutions"><span class="iconfont-archer">&#xe60a;</span>Solutions</span>
     
-        <span class="sidebar-category-name" data-categories="Basic"><span class="iconfont-archer">&#xe60a;</span>Basic</span>
+        <span class="sidebar-category-name" data-categories="troubleshoot"><span class="iconfont-archer">&#xe60a;</span>troubleshoot</span>
     
         <span class="sidebar-category-name" data-categories="Develop"><span class="iconfont-archer">&#xe60a;</span>Develop</span>
+    
+        <span class="sidebar-category-name" data-categories="Basic"><span class="iconfont-archer">&#xe60a;</span>Basic</span>
     
         <span class="sidebar-category-name" data-categories="Tools"><span class="iconfont-archer">&#xe60a;</span>Tools</span>
     

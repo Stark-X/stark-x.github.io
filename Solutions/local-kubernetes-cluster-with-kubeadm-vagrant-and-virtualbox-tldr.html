@@ -528,7 +528,7 @@ height:50vh;
 </ul>
 <h2 id="Vagrantfile">Vagrantfile</h2>
 <figure class="highlight ruby"><figcaption><span>Vagrantfile</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$script</span> = <span class="string">&lt;&lt;-SCRIPT</span></span><br><span class="line"><span class="string">echo &quot;Update and install the kubeadm&quot;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">apt-get update &amp;&amp; apt-get install -y apt-transport-https curl</span></span><br><span class="line"><span class="string">curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -</span></span><br><span class="line"><span class="string">cat &lt;&lt;EOF &gt;/etc/apt/sources.list.d/kubernetes.list</span></span><br><span class="line"><span class="string">deb https://apt.kubernetes.io/ kubernetes-xenial main</span></span><br><span class="line"><span class="string">EOF</span></span><br><span class="line"><span class="string">apt-get update</span></span><br><span class="line"><span class="string">apt-get install -y kubelet kubeadm kubectl docker.io</span></span><br><span class="line"><span class="string">apt-mark hold kubelet kubeadm kubectl</span></span><br><span class="line"><span class="string">usermod -aG docker vagrant</span></span><br><span class="line"><span class="string">kubeadm config images pull</span></span><br><span class="line"><span class="string">SCRIPT</span></span><br><span class="line"></span><br><span class="line">Vagrant.configure(<span class="string">&quot;2&quot;</span>) <span class="keyword">do</span> |<span class="params">config</span>|</span><br><span class="line">  config.vm.provider <span class="string">&quot;virtualbox&quot;</span> <span class="keyword">do</span> |<span class="params">v</span>|</span><br><span class="line">    v.memory = <span class="number">2048</span></span><br><span class="line">    v.cpus = <span class="number">2</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">  </span><br><span class="line">  config.vm.define <span class="string">&quot;master&quot;</span>, <span class="symbol">primary:</span> <span class="literal">true</span> <span class="keyword">do</span> |<span class="params">master</span>|</span><br><span class="line">    master.vm.hostname = <span class="string">&quot;k8s-cluster-master&quot;</span></span><br><span class="line">    master.vm.box = <span class="string">&quot;ubuntu/xenial64&quot;</span></span><br><span class="line">    master.vm.network <span class="string">&quot;forwarded_port&quot;</span>, <span class="symbol">guest:</span> <span class="number">80</span>, <span class="symbol">host:</span> <span class="number">10000</span>, <span class="symbol">protocol:</span> <span class="string">&quot;tcp&quot;</span></span><br><span class="line">    master.vm.network <span class="string">&quot;forwarded_port&quot;</span>, <span class="symbol">guest:</span> <span class="number">8001</span>, <span class="symbol">host:</span> <span class="number">8001</span>, <span class="symbol">protocol:</span> <span class="string">&quot;tcp&quot;</span></span><br><span class="line">    master.vm.network <span class="string">&quot;private_network&quot;</span>, <span class="symbol">type:</span> <span class="string">&quot;dhcp&quot;</span></span><br><span class="line">    master.vm.provision <span class="string">&quot;shell&quot;</span>, <span class="symbol">inline:</span> <span class="variable">$script</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  config.vm.define <span class="string">&quot;node&quot;</span> <span class="keyword">do</span> |<span class="params">node</span>|</span><br><span class="line">    node.vm.hostname = <span class="string">&quot;k8s-cluster-node&quot;</span></span><br><span class="line">    node.vm.box = <span class="string">&quot;ubuntu/xenial64&quot;</span></span><br><span class="line">    node.vm.network <span class="string">&quot;forwarded_port&quot;</span>, <span class="symbol">guest:</span> <span class="number">80</span>, <span class="symbol">host:</span> <span class="number">10001</span>, <span class="symbol">protocol:</span> <span class="string">&quot;tcp&quot;</span></span><br><span class="line">    node.vm.network <span class="string">&quot;private_network&quot;</span>, <span class="symbol">type:</span> <span class="string">&quot;dhcp&quot;</span></span><br><span class="line">    node.vm.provision <span class="string">&quot;shell&quot;</span>, <span class="symbol">inline:</span> <span class="variable">$script</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-<h2 id="启动节点">启动节点</h2>
+<h2 id="启动节点-2">启动节点</h2>
 <p>执行命令<code>vagrant up</code>，Vagrant 开始自动下载Ubuntu镜像，顺利启动后，vagrant 会执行我们写在<code>Vagrantfile</code>里的 Shell 脚本。初始化完成后，在当前窗口执行<code>vagrant ssh master</code>，新开一个窗口执行<code>vagrant ssh node</code>分别 ssh 进入到主节点以及工作节点。
 <img src="http://img-cdn.xjztest.com/20190305142616-vagrant_up.png.png" alt="vagrant up"><em><small>第一次执行<code>vagrant up</code>会看到更多的信息。</small></em></p>
 <p>使用命令<code>ip a</code>查看当前节点 ip，两个节点互相 ping，检查连通性。</p>
@@ -776,7 +776,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">目标</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">环境相关</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">实验环境设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E6%B1%82"><span class="toc-number">3.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vagrantfile"><span class="toc-number">3.2.</span> <span class="toc-text">Vagrantfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E8%8A%82%E7%82%B9"><span class="toc-number">3.3.</span> <span class="toc-text">启动节点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">4.</span> <span class="toc-text">部署 Kubernetes 集群</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text">部署 Kubernetes Dashboard</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">6.</span> <span class="toc-text">部署 Nginx</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#nginx-rs-yaml"><span class="toc-number">6.1.</span> <span class="toc-text">nginx-rs.yaml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2-2"><span class="toc-number">6.2.</span> <span class="toc-text">部署</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">7.</span> <span class="toc-text">完</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">1.</span> <span class="toc-text">目标</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">2.</span> <span class="toc-text">环境相关</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">3.</span> <span class="toc-text">实验环境设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E6%B1%82"><span class="toc-number">3.1.</span> <span class="toc-text">要求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vagrantfile"><span class="toc-number">3.2.</span> <span class="toc-text">Vagrantfile</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E8%8A%82%E7%82%B9-2"><span class="toc-number">3.3.</span> <span class="toc-text">启动节点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">4.</span> <span class="toc-text">部署 Kubernetes 集群</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">5.</span> <span class="toc-text">部署 Kubernetes Dashboard</span></a></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">6.</span> <span class="toc-text">部署 Nginx</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#nginx-rs-yaml"><span class="toc-number">6.1.</span> <span class="toc-text">nginx-rs.yaml</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2-2"><span class="toc-number">6.2.</span> <span class="toc-text">部署</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link"><span class="toc-number">7.</span> <span class="toc-text">完</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -789,12 +789,6 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
-    
-    
-    
-    
-    
-    
     
     
     
@@ -940,19 +934,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="Vim"><span class="iconfont-archer">&#xe606;</span>Vim</span>
     
-        <span class="sidebar-tag-name" data-tags="network"><span class="iconfont-archer">&#xe606;</span>network</span>
-    
         <span class="sidebar-tag-name" data-tags="Cloud"><span class="iconfont-archer">&#xe606;</span>Cloud</span>
     
         <span class="sidebar-tag-name" data-tags="OpenStack"><span class="iconfont-archer">&#xe606;</span>OpenStack</span>
     
         <span class="sidebar-tag-name" data-tags="Ops"><span class="iconfont-archer">&#xe606;</span>Ops</span>
     
-        <span class="sidebar-tag-name" data-tags="http"><span class="iconfont-archer">&#xe606;</span>http</span>
-    
-        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
-    
-        <span class="sidebar-tag-name" data-tags="疑难杂症"><span class="iconfont-archer">&#xe606;</span>疑难杂症</span>
+        <span class="sidebar-tag-name" data-tags="network"><span class="iconfont-archer">&#xe606;</span>network</span>
     
         <span class="sidebar-tag-name" data-tags="Kubernetes"><span class="iconfont-archer">&#xe606;</span>Kubernetes</span>
     
@@ -964,7 +952,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="mock"><span class="iconfont-archer">&#xe606;</span>mock</span>
     
+        <span class="sidebar-tag-name" data-tags="http"><span class="iconfont-archer">&#xe606;</span>http</span>
+    
         <span class="sidebar-tag-name" data-tags="Coding"><span class="iconfont-archer">&#xe606;</span>Coding</span>
+    
+        <span class="sidebar-tag-name" data-tags="shell"><span class="iconfont-archer">&#xe606;</span>shell</span>
+    
+        <span class="sidebar-tag-name" data-tags="疑难杂症"><span class="iconfont-archer">&#xe606;</span>疑难杂症</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -999,13 +993,13 @@ jsonContent:
         <div class="sidebar-panel-categories">
     <div class="sidebar-categories-name">
     
-        <span class="sidebar-category-name" data-categories="troubleshoot"><span class="iconfont-archer">&#xe60a;</span>troubleshoot</span>
-    
         <span class="sidebar-category-name" data-categories="Solutions"><span class="iconfont-archer">&#xe60a;</span>Solutions</span>
     
-        <span class="sidebar-category-name" data-categories="Basic"><span class="iconfont-archer">&#xe60a;</span>Basic</span>
+        <span class="sidebar-category-name" data-categories="troubleshoot"><span class="iconfont-archer">&#xe60a;</span>troubleshoot</span>
     
         <span class="sidebar-category-name" data-categories="Develop"><span class="iconfont-archer">&#xe60a;</span>Develop</span>
+    
+        <span class="sidebar-category-name" data-categories="Basic"><span class="iconfont-archer">&#xe60a;</span>Basic</span>
     
         <span class="sidebar-category-name" data-categories="Tools"><span class="iconfont-archer">&#xe60a;</span>Tools</span>
     
